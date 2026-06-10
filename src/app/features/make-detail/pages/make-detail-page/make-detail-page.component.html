@@ -1,0 +1,14 @@
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (detail(); as d) {
+  <app-breadcrumb [items]="breadcrumbs()" />
+  <section class="block">
+    <h2>Tipos de vehículo</h2>
+    <app-vehicle-types-list [types]="d.types" />
+  </section>
+  <section class="block block--models">
+    <h2>Modelos</h2>
+    <app-models-list [models]="d.models" />
+  </section>
+}

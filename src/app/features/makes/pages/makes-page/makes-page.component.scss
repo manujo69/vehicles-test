@@ -1,0 +1,22 @@
+@use 'common' as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+
+  .page-title {
+    @extend %page-title;
+  }
+
+  .search-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    app-search-box {
+      flex: 1;
+    }
+  }
+}

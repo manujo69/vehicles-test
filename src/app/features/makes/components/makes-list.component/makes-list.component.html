@@ -1,0 +1,19 @@
+@if (makes().length > 0) {
+  <cdk-virtual-scroll-viewport itemSize="56" class="viewport">
+    <button
+      *cdkVirtualFor="let make of makes(); trackBy: trackById"
+      type="button"
+      class="row"
+      (click)="select.emit(make.id)">
+      <mat-icon class="row__icon">directions_car</mat-icon>
+      <span class="row__label">{{ make.name }}</span>
+      <mat-icon class="row__chevron">chevron_right</mat-icon>
+    </button>
+  </cdk-virtual-scroll-viewport>
+} @else {
+  <div class="empty-state">
+    <mat-icon class="empty-state__icon">search_off</mat-icon>
+    <p class="empty-state__message">No se encontraron marcas</p>
+    <p class="empty-state__hint">Intenta con otro término de búsqueda</p>
+  </div>
+}

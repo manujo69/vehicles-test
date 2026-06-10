@@ -1,0 +1,9 @@
+@if (models().length > 0) {
+  <cdk-virtual-scroll-viewport itemSize="48" class="viewport">
+    <div *cdkVirtualFor="let model of models(); trackBy: trackById" class="row">
+      {{ model.name }}
+    </div>
+  </cdk-virtual-scroll-viewport>
+} @else {
+  <p class="empty">Sin modelos.</p>
+}

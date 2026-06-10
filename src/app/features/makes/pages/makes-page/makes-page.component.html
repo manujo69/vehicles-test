@@ -1,0 +1,19 @@
+<!-- <app-search-box (search)="onSearch($event)" /> -->
+
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else {
+  <div class="page-title">Lista de Marcas</div>
+  <div class="search-row">
+    <app-search-box [initialValue]="filter()" (search)="onSearch($event)" />
+    <button mat-mini-fab type="button" color="primary" (click)="makesList()?.scrollUp()">
+      <mat-icon>keyboard_arrow_up</mat-icon>
+    </button>
+    <button mat-mini-fab type="button" color="primary" (click)="makesList()?.scrollDown()">
+      <mat-icon>keyboard_arrow_down</mat-icon>
+    </button>
+  </div>
+  <app-makes-list [makes]="makes()" (select)="onSelect($event)" />
+}
+

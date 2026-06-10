@@ -1,0 +1,7 @@
+  <mat-list>
+    @for (type of types(); track type.id) {
+      <mat-list-item>{{ type.name }}</mat-list-item>
+    } @empty {
+      <p class="empty">Sin tipos de vehículo.</p>
+    }
+  </mat-list>

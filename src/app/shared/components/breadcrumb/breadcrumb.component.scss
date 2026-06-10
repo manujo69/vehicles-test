@@ -1,0 +1,37 @@
+@use 'common' as *;
+
+$base-separator-size: 24px;
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 16px;
+}
+
+.breadcrumb__link {
+  @extend %page-title;
+  color: var(--mat-sys-primary);
+  text-decoration: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--mat-sys-primary) 8%, transparent);
+  }
+}
+
+.breadcrumb__current {
+  @extend %page-title;
+  color: var(--mat-sys-on-surface-variant);
+  padding: 4px 6px;
+}
+
+.breadcrumb__separator {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: $base-separator-size;
+  width: $base-separator-size;
+  height: $base-separator-size;
+  line-height: 10px;
+}

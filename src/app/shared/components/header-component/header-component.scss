@@ -1,0 +1,13 @@
+@use 'common' as *;
+
+.app-header {
+  display: flex;
+  justify-content: $default-alignment;
+  align-items: $default-alignment;
+  padding: $default-title-padding;
+  border-bottom: $default-border;
+  background-color: $default-base-color;
+  font-size: $main-title-font-size;
+  font-weight: $big-title-weight;
+  color: $main-title-color;
+}

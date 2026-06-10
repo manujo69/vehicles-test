@@ -1,0 +1,46 @@
+// Name these colors with https://www.color-name.com
+$blue-de-france: #3498db;
+$dim-grey: #696969;
+$tech-white: #f5f5f5;
+$my-white: #ffffff;
+
+// Base colors
+$primary-color: $blue-de-france;
+$secondary-color: darken($primary-color, 20%);
+$default-grey-color: $dim-grey;
+
+$default-background-color: $my-white;
+$default-base-color: $tech-white;
+
+// Base styles
+$big-font-size: 24px;
+$medium-font-size: 18px;
+$small-font-size: 14px;
+
+$big-padding: 24px;
+$medium-padding: 16px;
+$small-padding: 8px;
+
+$default-alignment: center;
+$big-title-weight: 500;
+$medium-title-weight: 400;
+$small-title-weight: 300;
+
+// Common styles
+$main-title-color: $secondary-color;
+
+$default-padding: $medium-padding;
+$default-title-padding: $big-padding;
+$default-border: 1px solid $default-grey-color;
+
+$main-title-font-size: $big-font-size;
+
+$font-family: 'Roboto', sans-serif;
+
+%page-title {
+  margin: 0 0 16px;
+  font: $main-title-font-size $font-family;
+  font-weight: $big-title-weight;
+  color: var(--mat-sys-on-surface);
+}
+
