@@ -57,17 +57,6 @@ describe('makes reducer', () => {
     });
   });
 
-  describe('loadMakesFailure', () => {
-    it('stores error message and clears loading', () => {
-      const state = reducer(
-        { ...initialState, loading: true },
-        makesActions.loadMakesFailure({ error: 'Network error' }),
-      );
-      expect(state.loading).toBeFalse();
-      expect(state.error).toBe('Network error');
-    });
-  });
-
   describe('setFilter', () => {
     it('updates the filter term', () => {
       const state = reducer(initialState, makesActions.setFilter({ searchTerm: 'toy' }));

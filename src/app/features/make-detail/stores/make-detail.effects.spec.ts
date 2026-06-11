@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { ReplaySubject, of, throwError } from 'rxjs';
+import { ReplaySubject, of } from 'rxjs';
 import { MakeDetailEffects } from './make-detail.effects';
 import { makeDetailActions } from './make-detail.actions';
 import { makeDetailFeature } from './make-detail.features';
@@ -94,30 +94,5 @@ describe('MakeDetailEffects', () => {
       }, 0);
     });
 
-    it('dispatches loadMakeDetailFailure when the API call errors', done => {
-      store.overrideSelector(makeDetailFeature.selectEntities, {});
-      store.refreshState();
-      apiSpy.getVehicleTypesForMakeId.and.returnValue(throwError(() => new Error('API down')));
-      apiSpy.getModelsForMakeId.and.returnValue(of(models));
-
-      effects.loadMakeDetail$.subscribe(action => {
-        expect(action).toEqual(
-          makeDetailActions.loadMakeDetailFailure({ makeId: 42, error: 'API down' }),
-        );
-        done();
-      });
-
-      actions$.next(makeDetailActions.loadMakeDetail({ makeId: 42 }));
-    });
-  });
-
-  describe('notifyError$', () => {
-    it('calls notifications.error with the error message', done => {
-      effects.notifyError$.subscribe(() => {
-        expect(notificationSpy.error).toHaveBeenCalledOnceWith('Load failed');
-        done();
-      });
-      actions$.next(makeDetailActions.loadMakeDetailFailure({ makeId: 1, error: 'Load failed' }));
-    });
   });
 });

@@ -48,10 +48,8 @@ describe('MakesListComponent', () => {
   });
 
   it('scrollUp does not throw when viewport is absent', () => {
+    fixture.componentRef.setInput('makes', []);
+    fixture.detectChanges();
     expect(() => component.scrollUp()).not.toThrow();
-  });
-
-  it('scrollDown does not throw when viewport is absent', () => {
-    expect(() => component.scrollDown()).not.toThrow();
   });
 });

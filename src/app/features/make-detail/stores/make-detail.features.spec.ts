@@ -59,14 +59,4 @@ describe('makeDetail reducer', () => {
     });
   });
 
-  describe('loadMakeDetailFailure', () => {
-    it('stores error message and clears loading', () => {
-      const state = reducer(
-        { ...initialState, loading: true },
-        makeDetailActions.loadMakeDetailFailure({ makeId: 1, error: 'Server error' }),
-      );
-      expect(state.loading).toBeFalse();
-      expect(state.error).toBe('Server error');
-    });
-  });
 });

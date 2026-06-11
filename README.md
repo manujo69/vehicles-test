@@ -2,6 +2,16 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.27.
 
+## Node version
+
+Requires **Node 22.22.1**. Use [Volta](https://volta.sh) (recommended) or nvm:
+
+```bash
+# Volta — automatic, no extra step needed
+# nvm
+nvm use
+```
+
 ## Development server
 
 To start a local development server, run:
@@ -35,6 +45,17 @@ ng build
 ```
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+
+## Coverage thresholds
+
+| Metric     | Minimum |
+|------------|---------|
+| Statements | 90%     |
+| Branches   | 80%     |
+| Functions  | 80%     |
+| Lines      | 90%     |
+
+Run `npm run test:coverage` to check. The pre-commit hook enforces these thresholds automatically.
 
 ## Running unit tests
 

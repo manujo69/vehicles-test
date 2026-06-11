@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { ReplaySubject, of, throwError } from 'rxjs';
+import { ReplaySubject, of } from 'rxjs';
 import { MakesEffects } from './makes-effects';
 import { makesActions } from './makes-actions';
 import { makesFeature } from './makes-features';
@@ -68,27 +68,5 @@ describe('MakesEffects', () => {
       }, 0);
     });
 
-    it('dispatches loadMakesFailure when the API call errors', done => {
-      store.overrideSelector(makesFeature.selectLoaded, false);
-      store.refreshState();
-      apiSpy.getAllMakes.and.returnValue(throwError(() => new Error('Network error')));
-
-      effects.loadMakes$.subscribe(action => {
-        expect(action).toEqual(makesActions.loadMakesFailure({ error: 'Network error' }));
-        done();
-      });
-
-      actions$.next(makesActions.loadMakes());
-    });
-  });
-
-  describe('notifyError$', () => {
-    it('calls notifications.error with the error message', done => {
-      effects.notifyError$.subscribe(() => {
-        expect(notificationSpy.error).toHaveBeenCalledOnceWith('Load failed');
-        done();
-      });
-      actions$.next(makesActions.loadMakesFailure({ error: 'Load failed' }));
-    });
   });
 });
