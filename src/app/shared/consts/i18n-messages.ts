@@ -10,6 +10,8 @@ export const MESSAGES = {
     searchLabel: 'Buscar',
     empty: 'No se encontraron marcas',
     emptyHint: 'Intenta con otro término de búsqueda',
+    scrollUp: 'Subir',
+    scrollDown: 'Bajar',
   },
   makeDetail: {
     breadcrumb: 'Lista de marcas',

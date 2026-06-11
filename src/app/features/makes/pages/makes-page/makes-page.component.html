@@ -1,16 +1,13 @@
-<!-- <app-search-box (searched)="onSearch($event)" /> -->
-
-
 @if (loading()) {
   <app-loading-spinner />
 } @else {
   <div class="page-title">{{ messages.pageTitle }}</div>
   <div class="search-row">
     <app-search-box [initialValue]="filter()" (searched)="onSearch($event)" />
-    <button mat-mini-fab type="button" color="primary" (click)="makesList()?.scrollUp()">
+    <button mat-mini-fab type="button" color="primary" [attr.aria-label]="messages.scrollUp" (click)="makesList()?.scrollUp()">
       <mat-icon>keyboard_arrow_up</mat-icon>
     </button>
-    <button mat-mini-fab type="button" color="primary" (click)="makesList()?.scrollDown()">
+    <button mat-mini-fab type="button" color="primary" [attr.aria-label]="messages.scrollDown" (click)="makesList()?.scrollDown()">
       <mat-icon>keyboard_arrow_down</mat-icon>
     </button>
   </div>
