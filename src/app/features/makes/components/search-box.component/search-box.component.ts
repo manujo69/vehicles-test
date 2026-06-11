@@ -18,13 +18,13 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 })
 export class SearchBoxComponent implements OnInit {
   initialValue = input('');
-  search = output<string>();
+  searched = output<string>();
   protected readonly control = new FormControl('', { nonNullable: true });
 
   constructor() {
     this.control.valueChanges
       .pipe(debounceTime(250), distinctUntilChanged(), takeUntilDestroyed())
-      .subscribe(term => this.search.emit(term));
+      .subscribe(term => this.searched.emit(term));
   }
 
   ngOnInit(): void {

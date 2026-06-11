@@ -20,11 +20,17 @@ export class MakesEffects {
     this.actions$.pipe(
       ofType(makesActions.loadMakes),
       concatLatestFrom(() => this.store.select(makesFeature.selectLoaded)),
-      filter(([, loaded]) => !loaded),                       // no refetch si ya cargado
+      filter(([, loaded]) => !loaded),  // no refetch si ya cargado
       switchMap(() =>
         this.api.getAllMakes().pipe(
-          map(makes => makesActions.loadMakesSuccess({ makes })),
-          catchError(err => of(makesActions.loadMakesFailure({ error: err.message }))),
+          // next:
+          map(makes =>
+            makesActions.loadMakesSuccess({ makes })
+          ),
+          // error:
+          catchError(err =>
+            of(makesActions.loadMakesFailure({ error: err.message }))
+          ),
         ),
       ),
     ),

@@ -6,8 +6,9 @@ import { Make } from '../../domain/make.model';
 import { VehicleType } from '../../domain/vehicle-type.model';
 import { VehicleModel } from '../../domain/vehicle-model.model';
 import { MakeDto, ModelDto, VehicleTypeDto, VpicResponse } from './vpic.dto';
+import { environment } from '../../../environments/environment';
 
-const BASE_URL = 'https://vpic.nhtsa.dot.gov/api/vehicles';
+const BASE_URL = environment.apiUrl;
 
 @Injectable({ providedIn: 'root' })
 export class VpicApiService {

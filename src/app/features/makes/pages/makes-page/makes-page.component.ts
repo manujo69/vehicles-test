@@ -29,8 +29,8 @@ export class MakesPageComponent implements OnInit {
     this.store.dispatch(makesActions.loadMakes());
   }
 
-  onSearch(term: string): void {
-    this.store.dispatch(makesActions.setFilter({ term }));
+  onSearch(searchTerm: string): void {
+    this.store.dispatch(makesActions.setFilter({ searchTerm }));
   }
 
   onSelect(makeId: number): void {

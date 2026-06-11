@@ -7,6 +7,6 @@ export const makesActions = createActionGroup({
     'Load Makes': emptyProps(),
     'Load Makes Success': props<{ makes: Make[] }>(),
     'Load Makes Failure': props<{ error: string }>(),
-    'Set Filter': props<{ term: string }>(),
+    'Set Filter': props<{ searchTerm: string }>(),
   },
 });

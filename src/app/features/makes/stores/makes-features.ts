@@ -23,13 +23,22 @@ export const makesFeature = createFeature({
   name: 'makes',
   reducer: createReducer(
     initialState,
+
+    // Loading makes starts
     on(makesActions.loadMakes, state =>
       state.loaded ? state : { ...state, loading: true, error: null }),
+
+    // Makes loaded successfully
     on(makesActions.loadMakesSuccess, (state, { makes }) =>
       adapter.setAll(makes, { ...state, loading: false, loaded: true })),
+
+    // Loading makes failed!
     on(makesActions.loadMakesFailure, (state, { error }) =>
       ({ ...state, loading: false, error })),
-    on(makesActions.setFilter, (state, { term }) => ({ ...state, filter: term })),
+
+    // Filtering by text
+    on(makesActions.setFilter, (state, { searchTerm }) =>
+      ({ ...state, filter: searchTerm })),
   ),
   extraSelectors: ({ selectMakesState, selectFilter }) => {
     const selectAllMakes = createSelector(selectMakesState, adapter.getSelectors().selectAll);

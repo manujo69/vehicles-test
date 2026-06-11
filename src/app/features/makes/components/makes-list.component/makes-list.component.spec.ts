@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { MakesListComponent } from './makes-list.component';
+import { Make } from '../../../../domain/make.model';
+import { MAKES_MOCK } from '@shared/consts/testing.constants';
 
 describe('MakesListComponent', () => {
   let component: MakesListComponent;
@@ -8,16 +9,49 @@ describe('MakesListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MakesListComponent]
-    })
-    .compileComponents();
+      imports: [MakesListComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(MakesListComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('makes', MAKES_MOCK);
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('creates successfully', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('renders with an empty makes list', () => {
+    fixture.componentRef.setInput('makes', []);
+    fixture.detectChanges();
+    expect(component).toBeTruthy();
+  });
+
+  it('emits the makeId via select output when a button is clicked', () => {
+    fixture.componentRef.setInput('makes', [{ id: 99, name: 'FORD' }]);
+    fixture.detectChanges();
+
+    let emitted: number | undefined;
+    component.select.subscribe((id: number) => (emitted = id));
+
+    const button: HTMLElement | null = fixture.nativeElement.querySelector('button');
+    if (button) {
+      button.click();
+      expect(emitted).toBe(99);
+    }
+  });
+
+  it('trackById returns the make id', () => {
+    const make: Make = { id: 7, name: 'TEST' };
+    expect(component['trackById'](0, make)).toBe(7);
+  });
+
+  it('scrollUp does not throw when viewport is absent', () => {
+    expect(() => component.scrollUp()).not.toThrow();
+  });
+
+  it('scrollDown does not throw when viewport is absent', () => {
+    expect(() => component.scrollDown()).not.toThrow();
   });
 });

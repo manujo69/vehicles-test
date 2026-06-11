@@ -4,7 +4,7 @@
       *cdkVirtualFor="let make of makes(); trackBy: trackById"
       type="button"
       class="row"
-      (click)="select.emit(make.id)">
+      (click)="selected.emit(make.id)">
       <mat-icon class="row__icon">directions_car</mat-icon>
       <span class="row__label">{{ make.name }}</span>
       <mat-icon class="row__chevron">chevron_right</mat-icon>

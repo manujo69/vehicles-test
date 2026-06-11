@@ -14,7 +14,7 @@ import { Make } from '../../../../domain/make.model';
 })
 export class MakesListComponent {
   makes = input.required<Make[]>();
-  select = output<number>();
+  selected = output<number>();
 
   private readonly viewport = viewChild(CdkVirtualScrollViewport);
 

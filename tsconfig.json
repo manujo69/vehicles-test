@@ -16,7 +16,8 @@
     "module": "preserve",
     "paths": {
       "@components/*": ["./src/app/shared/components/*"],
-      "@shared-styles/*": ["./src/app/shared/styles/*"]
+      "@shared-styles/*": ["./src/app/shared/styles/*"],
+      "@shared/*": ["./src/app/shared/*"],
     }
   },
   "angularCompilerOptions": {
