@@ -1,7 +1,7 @@
 import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
 import { makesActions } from './makes-actions';
-import { Make } from '../../../domain/make.model';
+import { Make } from '@domain/make.model';
 
 export interface MakesState extends EntityState<Make> {
   filter: string;

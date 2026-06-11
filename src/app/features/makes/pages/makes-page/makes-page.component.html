@@ -4,7 +4,7 @@
 @if (loading()) {
   <app-loading-spinner />
 } @else {
-  <div class="page-title">Lista de Marcas</div>
+  <div class="page-title">{{ messages.pageTitle }}</div>
   <div class="search-row">
     <app-search-box [initialValue]="filter()" (searched)="onSearch($event)" />
     <button mat-mini-fab type="button" color="primary" (click)="makesList()?.scrollUp()">

@@ -5,8 +5,8 @@ import { ReplaySubject, of, throwError } from 'rxjs';
 import { MakesEffects } from './makes-effects';
 import { makesActions } from './makes-actions';
 import { makesFeature } from './makes-features';
-import { VpicApiService } from '../../../core/api/vpic-api.service';
-import { NotificationService } from '../../../shared/services/notification.service';
+import { VpicApiService } from '@core/api/vpic-api.service';
+import { NotificationService } from '@shared/services/notification.service';
 import { MAKES_MOCK } from '@shared/consts/testing.constants';
 
 describe('MakesEffects', () => {

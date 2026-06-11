@@ -2,9 +2,9 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { VpicApiService } from './vpic-api.service';
-import { Make } from '../../domain/make.model';
-import { VehicleType } from '../../domain/vehicle-type.model';
-import { VehicleModel } from '../../domain/vehicle-model.model';
+import { Make } from '@domain/make.model';
+import { VehicleType } from '@domain/vehicle-type.model';
+import { VehicleModel } from '@domain/vehicle-model.model';
 
 const BASE_URL = 'https://vpic.nhtsa.dot.gov/api/vehicles';
 

@@ -1,7 +1,7 @@
-// features/make-detail/components/vehicle-types-list/vehicle-types-list.component.ts
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatListModule } from '@angular/material/list';
-import { VehicleType } from '../../../../domain/vehicle-type.model';
+import { VehicleType } from '@domain/vehicle-type.model';
+import { MESSAGES } from '@shared/consts/i18n-messages';
 
 @Component({
   selector: 'app-vehicle-types-list',
@@ -11,4 +11,5 @@ import { VehicleType } from '../../../../domain/vehicle-type.model';
 })
 export class VehicleTypesListComponent {
   types = input.required<VehicleType[]>();
+  protected readonly messages = MESSAGES.makeDetail;
 }

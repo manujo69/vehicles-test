@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { Make } from '../../../domain/make.model';
+import { Make } from '@domain/make.model';
 
 export const makesActions = createActionGroup({
   source: 'Makes',

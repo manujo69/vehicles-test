@@ -5,10 +5,10 @@ import { ReplaySubject, of, throwError } from 'rxjs';
 import { MakeDetailEffects } from './make-detail.effects';
 import { makeDetailActions } from './make-detail.actions';
 import { makeDetailFeature } from './make-detail.features';
-import { VpicApiService } from '../../../core/api/vpic-api.service';
-import { NotificationService } from '../../../shared/services/notification.service';
-import { VehicleType } from '../../../domain/vehicle-type.model';
-import { VehicleModel } from '../../../domain/vehicle-model.model';
+import { VpicApiService } from '@core/api/vpic-api.service';
+import { NotificationService } from '@shared/services/notification.service';
+import { VehicleType } from '@domain/vehicle-type.model';
+import { VehicleModel } from '@domain/vehicle-model.model';
 
 describe('MakeDetailEffects', () => {
   let effects: MakeDetailEffects;

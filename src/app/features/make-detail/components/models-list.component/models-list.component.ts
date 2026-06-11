@@ -1,7 +1,7 @@
-// features/make-detail/components/models-list/models-list.component.ts
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { VehicleModel } from '../../../../domain/vehicle-model.model';
+import { VehicleModel } from '@domain/vehicle-model.model';
+import { MESSAGES } from '@shared/consts/i18n-messages';
 
 @Component({
   selector: 'app-models-list',
@@ -12,6 +12,7 @@ import { VehicleModel } from '../../../../domain/vehicle-model.model';
 })
 export class ModelsListComponent {
   models = input.required<VehicleModel[]>();
+  protected readonly messages = MESSAGES.makeDetail;
 
   protected trackById = (_: number, model: VehicleModel) => model.id;
 }

@@ -8,6 +8,8 @@ import { makeDetailFeature } from '../../stores/make-detail.features';
 import { Store } from '@ngrx/store';
 import { makeDetailActions } from '../../stores/make-detail.actions';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@components/breadcrumb/breadcrumb.component';
+import { ROUTES } from '@shared/consts/routes.constants';
+import { MESSAGES } from '@shared/consts/i18n-messages';
 
 @Component({
   selector: 'app-make-detail-page',
@@ -19,15 +21,19 @@ import { BreadcrumbComponent, type BreadcrumbItem } from '@components/breadcrumb
 export class MakeDetailPageComponent {
   private readonly store = inject(Store);
 
+  // Input Signal for makeId
   makeId = input.required({ transform: numberAttribute });
 
-  private readonly entities = this.store.selectSignal(makeDetailFeature.selectEntities);
   protected readonly loading = this.store.selectSignal(makeDetailFeature.selectLoading);
+
+  private readonly entities = this.store.selectSignal(makeDetailFeature.selectEntities);
   protected readonly detail = computed(() => this.entities()[this.makeId()]);
 
+  protected readonly messages = MESSAGES.makeDetail;
+
   protected readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
-    { label: 'Lista de marcas', route: '/makes' },
-    { label: this.detail()?.models[0]?.makeName ?? 'Detalle' },
+    { label: MESSAGES.makeDetail.breadcrumb, route: ROUTES.MAKES_PATH },
+    { label: this.detail()?.models[0]?.makeName ?? MESSAGES.makeDetail.breadcrumbFallback },
   ]);
 
   constructor() {

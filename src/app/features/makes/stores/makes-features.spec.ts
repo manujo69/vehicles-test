@@ -1,6 +1,6 @@
 import { adapter, makesFeature, MakesState } from './makes-features';
 import { makesActions } from './makes-actions';
-import { Make } from '../../../domain/make.model';
+import { Make } from '@domain/make.model';
 import { MAKES_MOCK } from '@shared/consts/testing.constants';
 
 const reducer = makesFeature.reducer;

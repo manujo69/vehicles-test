@@ -13,7 +13,7 @@
 } @else {
   <div class="empty-state">
     <mat-icon class="empty-state__icon">search_off</mat-icon>
-    <p class="empty-state__message">No se encontraron marcas</p>
-    <p class="empty-state__hint">Intenta con otro término de búsqueda</p>
+    <p class="empty-state__message">{{ messages.empty }}</p>
+    <p class="empty-state__hint">{{ messages.emptyHint }}</p>
   </div>
 }

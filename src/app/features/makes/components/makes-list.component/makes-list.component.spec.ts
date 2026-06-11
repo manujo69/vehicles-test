@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MakesListComponent } from './makes-list.component';
-import { Make } from '../../../../domain/make.model';
+import { Make } from '@domain/make.model';
 import { MAKES_MOCK } from '@shared/consts/testing.constants';
 
 describe('MakesListComponent', () => {
@@ -33,7 +33,7 @@ describe('MakesListComponent', () => {
     fixture.detectChanges();
 
     let emitted: number | undefined;
-    component.select.subscribe((id: number) => (emitted = id));
+    component.selected.subscribe((id: number) => (emitted = id));
 
     const button: HTMLElement | null = fixture.nativeElement.querySelector('button');
     if (button) {

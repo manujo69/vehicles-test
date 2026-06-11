@@ -1,7 +1,7 @@
 import { adapter, makeDetailFeature, MakeDetailState } from './make-detail.features';
 import { makeDetailActions } from './make-detail.actions';
-import { VehicleType } from '../../../domain/vehicle-type.model';
-import { VehicleModel } from '../../../domain/vehicle-model.model';
+import { VehicleType } from '@domain/vehicle-type.model';
+import { VehicleModel } from '@domain/vehicle-model.model';
 
 const reducer = makeDetailFeature.reducer;
 

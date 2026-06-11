@@ -1,4 +1,3 @@
-// features/makes/components/search-box/search-box.component.ts
 import { ChangeDetectionStrategy, Component, input, OnInit, output } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -6,6 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { MESSAGES } from '@shared/consts/i18n-messages';
 
 @Component({
   selector: 'app-search-box',
@@ -19,6 +19,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 export class SearchBoxComponent implements OnInit {
   initialValue = input('');
   searched = output<string>();
+  protected readonly messages = MESSAGES.makes;
   protected readonly control = new FormControl('', { nonNullable: true });
 
   constructor() {

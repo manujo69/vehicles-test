@@ -1,9 +1,9 @@
-// features/makes/components/makes-list/makes-list.component.ts
 import { ChangeDetectionStrategy, Component, input, output, viewChild } from '@angular/core';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Make } from '../../../../domain/make.model';
+import { Make } from '@domain/make.model';
+import { MESSAGES } from '@shared/consts/i18n-messages';
 
 @Component({
   selector: 'app-makes-list',
@@ -18,6 +18,7 @@ export class MakesListComponent {
 
   private readonly viewport = viewChild(CdkVirtualScrollViewport);
 
+  protected readonly messages = MESSAGES.makes;
   protected trackById = (_: number, make: Make) => make.id;
 
   scrollUp(): void {

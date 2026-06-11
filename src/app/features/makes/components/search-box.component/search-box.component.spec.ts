@@ -31,7 +31,7 @@ describe('SearchBoxComponent', () => {
   it('emits search after debounce when control value changes', fakeAsync(() => {
     fixture.detectChanges();
     const emitted: string[] = [];
-    component.search.subscribe((term: string) => emitted.push(term));
+    component.searched.subscribe((term: string) => emitted.push(term));
 
     component['control'].setValue('honda');
     tick(250);
@@ -42,7 +42,7 @@ describe('SearchBoxComponent', () => {
   it('does not emit before debounce time elapses', fakeAsync(() => {
     fixture.detectChanges();
     const emitted: string[] = [];
-    component.search.subscribe((term: string) => emitted.push(term));
+    component.searched.subscribe((term: string) => emitted.push(term));
 
     component['control'].setValue('ho');
     tick(100);
@@ -54,7 +54,7 @@ describe('SearchBoxComponent', () => {
   it('emits only the last value within the debounce window', fakeAsync(() => {
     fixture.detectChanges();
     const emitted: string[] = [];
-    component.search.subscribe((term: string) => emitted.push(term));
+    component.searched.subscribe((term: string) => emitted.push(term));
 
     component['control'].setValue('h');
     tick(100);
@@ -69,7 +69,7 @@ describe('SearchBoxComponent', () => {
   it('does not emit the same value twice in a row (distinctUntilChanged)', fakeAsync(() => {
     fixture.detectChanges();
     const emitted: string[] = [];
-    component.search.subscribe((term: string) => emitted.push(term));
+    component.searched.subscribe((term: string) => emitted.push(term));
 
     component['control'].setValue('toyota');
     tick(250);

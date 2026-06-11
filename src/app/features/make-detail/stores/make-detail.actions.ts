@@ -1,6 +1,6 @@
 import { createActionGroup, props } from '@ngrx/store';
-import { VehicleType } from '../../../domain/vehicle-type.model';
-import { VehicleModel } from '../../../domain/vehicle-model.model';
+import { VehicleType } from '@domain/vehicle-type.model';
+import { VehicleModel } from '@domain/vehicle-model.model';
 
 export const makeDetailActions = createActionGroup({
   source: 'Make Detail',

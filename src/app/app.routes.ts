@@ -1,14 +1,15 @@
 import { Routes } from '@angular/router';
+import { ROUTES } from './shared/consts/routes.constants';
 
 export const routes: Routes = [
   {
-    path: 'makes',
+    path: ROUTES.MAKES,
     loadChildren: () => import('./features/makes/makes.routes').then(m => m.routes),
   },
   {
-    path: 'makes/:makeId',
+    path: `${ROUTES.MAKES}/:${ROUTES.MAKE_ID_PARAM}`,
     loadChildren: () => import('./features/make-detail/make-detail.routes').then(m => m.routes),
   },
-  { path: '', redirectTo: 'makes', pathMatch: 'full' },
-  { path: '**', redirectTo: 'makes' },
+  { path: '', redirectTo: ROUTES.MAKES, pathMatch: 'full' },
+  { path: '**', redirectTo: ROUTES.MAKES },
 ];

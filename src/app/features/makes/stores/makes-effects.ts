@@ -3,8 +3,8 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { concatLatestFrom } from '@ngrx/operators';
 import { Store } from '@ngrx/store';
 import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
-import { VpicApiService } from '../../../core/api/vpic-api.service';
-import { NotificationService } from '../../../shared/services/notification.service';
+import { VpicApiService } from '@core/api/vpic-api.service';
+import { NotificationService } from '@shared/services/notification.service';
 import { makesFeature } from './makes-features';
 import { makesActions } from './makes-actions';
 

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { MESSAGES } from '../../consts/i18n-messages';
 
 @Component({
   selector: 'app-header-component',
@@ -7,5 +8,5 @@ import { Component } from '@angular/core';
   styleUrl: './header-component.scss',
 })
 export class HeaderComponent {
-
+  protected readonly messages = MESSAGES.app;
 }

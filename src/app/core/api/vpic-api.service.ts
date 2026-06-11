@@ -2,9 +2,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { Make } from '../../domain/make.model';
-import { VehicleType } from '../../domain/vehicle-type.model';
-import { VehicleModel } from '../../domain/vehicle-model.model';
+import { Make } from '@domain/make.model';
+import { VehicleType } from '@domain/vehicle-type.model';
+import { VehicleModel } from '@domain/vehicle-model.model';
 import { MakeDto, ModelDto, VehicleTypeDto, VpicResponse } from './vpic.dto';
 import { environment } from '../../../environments/environment';
 

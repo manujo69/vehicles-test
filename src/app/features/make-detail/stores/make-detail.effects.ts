@@ -3,8 +3,8 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { concatLatestFrom } from '@ngrx/operators';
 import { Store } from '@ngrx/store';
 import { catchError, filter, forkJoin, map, of, switchMap, tap } from 'rxjs';
-import { VpicApiService } from '../../../core/api/vpic-api.service';
-import { NotificationService } from '../../../shared/services/notification.service';
+import { VpicApiService } from '@core/api/vpic-api.service';
+import { NotificationService } from '@shared/services/notification.service';
 import { makeDetailActions } from './make-detail.actions';
 import { makeDetailFeature } from './make-detail.features';
 
@@ -19,14 +19,17 @@ export class MakeDetailEffects {
     this.actions$.pipe(
       ofType(makeDetailActions.loadMakeDetail),
       concatLatestFrom(() => this.store.select(makeDetailFeature.selectEntities)),
-      filter(([{ makeId }, entities]) => !entities[makeId]),   // no refetch si ese makeId ya está
+      // no refetch si ese makeId ya está cargado
+      filter(([{ makeId }, entities]) => !entities[makeId]),
       switchMap(([{ makeId }]) =>
         forkJoin({
           types: this.api.getVehicleTypesForMakeId(makeId),
           models: this.api.getModelsForMakeId(makeId),
         }).pipe(
+           // next:
           map(({ types, models }) =>
             makeDetailActions.loadMakeDetailSuccess({ makeId, types, models })),
+          // error:
           catchError(err =>
             of(makeDetailActions.loadMakeDetailFailure({ makeId, error: err.message }))),
         ),
