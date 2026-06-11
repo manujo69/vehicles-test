@@ -1,7 +1,6 @@
 # VehiclesTest
 
 [![Live Demo](https://img.shields.io/badge/demo-GitHub%20Pages-blue)](https://manujo69.github.io/vehicles-test/)
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz_small.svg)](https://stackblitz.com/github/manujo69/vehicles-test)
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.27.
 
