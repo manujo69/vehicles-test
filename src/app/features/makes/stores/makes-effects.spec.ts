@@ -5,8 +5,8 @@ import { ReplaySubject, of } from 'rxjs';
 import { MakesEffects } from './makes-effects';
 import { makesActions } from './makes-actions';
 import { makesFeature } from './makes-features';
-import { VpicApiService } from '@core/api/vpic-api.service';
-import { NotificationService } from '@shared/services/notification.service';
+import { VehicleRepositoryPort } from '@core/vehicle-repository.port';
+import { NotificationPort } from '@core/notification.port';
 import { MAKES_MOCK } from '@shared/consts/testing.constants';
 
 describe('MakesEffects', () => {
@@ -14,22 +14,22 @@ describe('MakesEffects', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let actions$: ReplaySubject<any>;
   let store: MockStore;
-  let apiSpy: jasmine.SpyObj<VpicApiService>;
-  let notificationSpy: jasmine.SpyObj<NotificationService>;
+  let repositorySpy: jasmine.SpyObj<VehicleRepositoryPort>;
+  let notificationSpy: jasmine.SpyObj<NotificationPort>;
 
 
   beforeEach(() => {
     actions$ = new ReplaySubject(1);
-    apiSpy = jasmine.createSpyObj<VpicApiService>('VpicApiService', ['getAllMakes']);
-    notificationSpy = jasmine.createSpyObj<NotificationService>('NotificationService', ['error']);
+    repositorySpy = jasmine.createSpyObj<VehicleRepositoryPort>('VehicleRepositoryPort', ['getAllMakes']);
+    notificationSpy = jasmine.createSpyObj<NotificationPort>('NotificationPort', ['error']);
 
     TestBed.configureTestingModule({
       providers: [
         MakesEffects,
         provideMockActions(() => actions$),
         provideMockStore(),
-        { provide: VpicApiService, useValue: apiSpy },
-        { provide: NotificationService, useValue: notificationSpy },
+        { provide: VehicleRepositoryPort, useValue: repositorySpy },
+        { provide: NotificationPort, useValue: notificationSpy },
       ],
     });
 
@@ -43,7 +43,7 @@ describe('MakesEffects', () => {
     it('dispatches loadMakesSuccess when data is not yet loaded', done => {
       store.overrideSelector(makesFeature.selectLoaded, false);
       store.refreshState();
-      apiSpy.getAllMakes.and.returnValue(of(MAKES_MOCK));
+      repositorySpy.getAllMakes.and.returnValue(of(MAKES_MOCK));
 
       effects.loadMakes$.subscribe(action => {
         expect(action).toEqual(makesActions.loadMakesSuccess({ makes: MAKES_MOCK }));
@@ -63,7 +63,7 @@ describe('MakesEffects', () => {
 
       setTimeout(() => {
         expect(emitted).toBeFalse();
-        expect(apiSpy.getAllMakes).not.toHaveBeenCalled();
+        expect(repositorySpy.getAllMakes).not.toHaveBeenCalled();
         done();
       }, 0);
     });

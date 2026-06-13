@@ -10,6 +10,10 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { makesFeature } from './features/makes/stores/makes-features';
 import { MakesEffects } from './features/makes/stores/makes-effects';
+import { VehicleRepositoryPort } from './_ports/vehicle-repository.port';
+import { VpicHttpAdapter } from './_adapters/http/vpic-http.adapter';
+import { NotificationPort } from './_ports/notification.port';
+import { SnackbarNotificationAdapter } from './_adapters/notification/snackbar-notification.adapter';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,5 +25,7 @@ export const appConfig: ApplicationConfig = {
     provideState(makesFeature),
     provideEffects(MakesEffects),
     provideStoreDevtools({ maxAge: 25, logOnly: environment.production }),
+    { provide: VehicleRepositoryPort, useClass: VpicHttpAdapter },
+    { provide: NotificationPort, useClass: SnackbarNotificationAdapter },
   ],
 };

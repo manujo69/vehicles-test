@@ -5,8 +5,8 @@ import { ReplaySubject, of } from 'rxjs';
 import { MakeDetailEffects } from './make-detail.effects';
 import { makeDetailActions } from './make-detail.actions';
 import { makeDetailFeature } from './make-detail.features';
-import { VpicApiService } from '@core/api/vpic-api.service';
-import { NotificationService } from '@shared/services/notification.service';
+import { VehicleRepositoryPort } from '@core/vehicle-repository.port';
+import { NotificationPort } from '@core/notification.port';
 import { VehicleType } from '@domain/vehicle-type.model';
 import { VehicleModel } from '@domain/vehicle-model.model';
 
@@ -15,27 +15,27 @@ describe('MakeDetailEffects', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let actions$: ReplaySubject<any>;
   let store: MockStore;
-  let apiSpy: jasmine.SpyObj<VpicApiService>;
-  let notificationSpy: jasmine.SpyObj<NotificationService>;
+  let repositorySpy: jasmine.SpyObj<VehicleRepositoryPort>;
+  let notificationSpy: jasmine.SpyObj<NotificationPort>;
 
   const types: VehicleType[] = [{ id: 1, name: 'Passenger Car' }];
   const models: VehicleModel[] = [{ id: 10, name: 'Corolla', makeName: 'TOYOTA' }];
 
   beforeEach(() => {
     actions$ = new ReplaySubject(1);
-    apiSpy = jasmine.createSpyObj<VpicApiService>('VpicApiService', [
+    repositorySpy = jasmine.createSpyObj<VehicleRepositoryPort>('VehicleRepositoryPort', [
       'getVehicleTypesForMakeId',
       'getModelsForMakeId',
     ]);
-    notificationSpy = jasmine.createSpyObj<NotificationService>('NotificationService', ['error']);
+    notificationSpy = jasmine.createSpyObj<NotificationPort>('NotificationPort', ['error']);
 
     TestBed.configureTestingModule({
       providers: [
         MakeDetailEffects,
         provideMockActions(() => actions$),
         provideMockStore(),
-        { provide: VpicApiService, useValue: apiSpy },
-        { provide: NotificationService, useValue: notificationSpy },
+        { provide: VehicleRepositoryPort, useValue: repositorySpy },
+        { provide: NotificationPort, useValue: notificationSpy },
       ],
     });
 
@@ -49,8 +49,8 @@ describe('MakeDetailEffects', () => {
     it('dispatches loadMakeDetailSuccess when makeId is not cached', done => {
       store.overrideSelector(makeDetailFeature.selectEntities, {});
       store.refreshState();
-      apiSpy.getVehicleTypesForMakeId.and.returnValue(of(types));
-      apiSpy.getModelsForMakeId.and.returnValue(of(models));
+      repositorySpy.getVehicleTypesForMakeId.and.returnValue(of(types));
+      repositorySpy.getModelsForMakeId.and.returnValue(of(models));
 
       effects.loadMakeDetail$.subscribe(action => {
         expect(action).toEqual(
@@ -62,15 +62,15 @@ describe('MakeDetailEffects', () => {
       actions$.next(makeDetailActions.loadMakeDetail({ makeId: 42 }));
     });
 
-    it('calls the API with the correct makeId', done => {
+    it('calls the repository with the correct makeId', done => {
       store.overrideSelector(makeDetailFeature.selectEntities, {});
       store.refreshState();
-      apiSpy.getVehicleTypesForMakeId.and.returnValue(of(types));
-      apiSpy.getModelsForMakeId.and.returnValue(of(models));
+      repositorySpy.getVehicleTypesForMakeId.and.returnValue(of(types));
+      repositorySpy.getModelsForMakeId.and.returnValue(of(models));
 
       effects.loadMakeDetail$.subscribe(() => {
-        expect(apiSpy.getVehicleTypesForMakeId).toHaveBeenCalledWith(7);
-        expect(apiSpy.getModelsForMakeId).toHaveBeenCalledWith(7);
+        expect(repositorySpy.getVehicleTypesForMakeId).toHaveBeenCalledWith(7);
+        expect(repositorySpy.getModelsForMakeId).toHaveBeenCalledWith(7);
         done();
       });
 
@@ -89,7 +89,7 @@ describe('MakeDetailEffects', () => {
 
       setTimeout(() => {
         expect(emitted).toBeFalse();
-        expect(apiSpy.getVehicleTypesForMakeId).not.toHaveBeenCalled();
+        expect(repositorySpy.getVehicleTypesForMakeId).not.toHaveBeenCalled();
         done();
       }, 0);
     });

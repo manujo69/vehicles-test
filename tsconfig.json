@@ -18,8 +18,9 @@
       "@components/*": ["./src/app/shared/components/*"],
       "@shared-styles/*": ["./src/app/shared/styles/*"],
       "@shared/*": ["./src/app/shared/*"],
-      "@core/*": ["./src/app/core/*"],
+      "@core/*": ["./src/app/_ports/*"],
       "@domain/*": ["./src/app/domain/*"],
+      "@infra/*": ["./src/app/_adapters/*"],
     }
   },
   "angularCompilerOptions": {

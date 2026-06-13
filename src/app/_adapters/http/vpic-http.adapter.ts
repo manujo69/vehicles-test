@@ -1,4 +1,3 @@
-// core/api/vpic-api.service.ts
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
@@ -6,12 +5,13 @@ import { Make } from '@domain/make.model';
 import { VehicleType } from '@domain/vehicle-type.model';
 import { VehicleModel } from '@domain/vehicle-model.model';
 import { MakeDto, ModelDto, VehicleTypeDto, VpicResponse } from './vpic.dto';
+import { VehicleRepositoryPort } from '../../_ports/vehicle-repository.port';
 import { environment } from '../../../environments/environment';
 
 const BASE_URL = environment.apiUrl;
 
-@Injectable({ providedIn: 'root' })
-export class VpicApiService {
+@Injectable()
+export class VpicHttpAdapter implements VehicleRepositoryPort {
   private readonly http = inject(HttpClient);
 
   getAllMakes(): Observable<Make[]> {

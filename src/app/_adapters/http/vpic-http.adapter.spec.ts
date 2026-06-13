@@ -1,22 +1,27 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { VpicApiService } from './vpic-api.service';
+import { VpicHttpAdapter } from './vpic-http.adapter';
+import { VehicleRepositoryPort } from '@core/vehicle-repository.port';
 import { Make } from '@domain/make.model';
 import { VehicleType } from '@domain/vehicle-type.model';
 import { VehicleModel } from '@domain/vehicle-model.model';
 
 const BASE_URL = 'https://vpic.nhtsa.dot.gov/api/vehicles';
 
-describe('VpicApiService', () => {
-  let service: VpicApiService;
+describe('VpicHttpAdapter', () => {
+  let adapter: VehicleRepositoryPort;
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: VehicleRepositoryPort, useClass: VpicHttpAdapter },
+      ],
     });
-    service = TestBed.inject(VpicApiService);
+    adapter = TestBed.inject(VehicleRepositoryPort);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
@@ -25,7 +30,7 @@ describe('VpicApiService', () => {
   describe('getAllMakes', () => {
     it('maps Make_ID and Make_Name to domain model', () => {
       let result: Make[] = [];
-      service.getAllMakes().subscribe(m => (result = m));
+      adapter.getAllMakes().subscribe(m => (result = m));
 
       const req = httpMock.expectOne(r => r.url === `${BASE_URL}/GetAllMakes`);
       req.flush({ Results: [{ Make_ID: 1, Make_Name: 'TOYOTA' }, { Make_ID: 2, Make_Name: 'HONDA' }] });
@@ -37,7 +42,7 @@ describe('VpicApiService', () => {
     });
 
     it('passes format=json query param', () => {
-      service.getAllMakes().subscribe();
+      adapter.getAllMakes().subscribe();
       const req = httpMock.expectOne(r => r.url === `${BASE_URL}/GetAllMakes`);
       expect(req.request.params.get('format')).toBe('json');
       req.flush({ Results: [] });
@@ -45,7 +50,7 @@ describe('VpicApiService', () => {
 
     it('returns empty array when Results is empty', () => {
       let result: Make[] = [{ id: 1, name: 'x' }];
-      service.getAllMakes().subscribe(m => (result = m));
+      adapter.getAllMakes().subscribe(m => (result = m));
       httpMock.expectOne(r => r.url === `${BASE_URL}/GetAllMakes`).flush({ Results: [] });
       expect(result).toEqual([]);
     });
@@ -54,7 +59,7 @@ describe('VpicApiService', () => {
   describe('getVehicleTypesForMakeId', () => {
     it('maps VehicleTypeId and VehicleTypeName to domain model', () => {
       let result: VehicleType[] = [];
-      service.getVehicleTypesForMakeId(99).subscribe(t => (result = t));
+      adapter.getVehicleTypesForMakeId(99).subscribe(t => (result = t));
 
       const req = httpMock.expectOne(r => r.url === `${BASE_URL}/GetVehicleTypesForMakeId/99`);
       req.flush({ Results: [{ VehicleTypeId: 5, VehicleTypeName: 'Truck' }] });
@@ -63,7 +68,7 @@ describe('VpicApiService', () => {
     });
 
     it('builds URL with the correct makeId', () => {
-      service.getVehicleTypesForMakeId(42).subscribe();
+      adapter.getVehicleTypesForMakeId(42).subscribe();
       const req = httpMock.expectOne(r => r.url === `${BASE_URL}/GetVehicleTypesForMakeId/42`);
       req.flush({ Results: [] });
       expect(req.request.url).toContain('42');
@@ -73,7 +78,7 @@ describe('VpicApiService', () => {
   describe('getModelsForMakeId', () => {
     it('maps Model_ID, Model_Name and Make_Name to domain model', () => {
       let result: VehicleModel[] = [];
-      service.getModelsForMakeId(42).subscribe(m => (result = m));
+      adapter.getModelsForMakeId(42).subscribe(m => (result = m));
 
       const req = httpMock.expectOne(r => r.url === `${BASE_URL}/GetModelsForMakeId/42`);
       req.flush({
@@ -85,7 +90,7 @@ describe('VpicApiService', () => {
 
     it('maps multiple models correctly', () => {
       let result: VehicleModel[] = [];
-      service.getModelsForMakeId(1).subscribe(m => (result = m));
+      adapter.getModelsForMakeId(1).subscribe(m => (result = m));
 
       httpMock.expectOne(r => r.url === `${BASE_URL}/GetModelsForMakeId/1`).flush({
         Results: [

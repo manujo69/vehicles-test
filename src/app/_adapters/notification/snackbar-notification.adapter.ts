@@ -1,10 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MESSAGES } from '../consts/i18n-messages';
+import { NotificationPort } from '../../_ports/notification.port';
+import { MESSAGES } from '@shared/consts/i18n-messages';
 
 const NOTIFICATION_DURATION_MS = 5000;
-@Injectable({ providedIn: 'root' })
-export class NotificationService {
+
+@Injectable()
+export class SnackbarNotificationAdapter implements NotificationPort {
   private readonly snackBar = inject(MatSnackBar);
 
   error(message: string): void {
