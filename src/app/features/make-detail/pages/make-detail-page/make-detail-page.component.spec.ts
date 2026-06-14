@@ -1,34 +1,36 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { provideMockStore, MockStore } from '@ngrx/store/testing';
+import { signal } from '@angular/core';
 import { MakeDetailPageComponent } from './make-detail-page.component';
-import { makeDetailActions } from '../../stores/make-detail.actions';
-import { makeDetailFeature } from '../../stores/make-detail.features';
-import { adapter } from '../../stores/make-detail.features';
-
-const initialState = {
-  makeDetail: adapter.getInitialState({ loading: false, error: null }),
-};
+import { MakeDetailStore, MakeDetail } from '../../stores/make-detail.store';
 
 describe('MakeDetailPageComponent', () => {
   let component: MakeDetailPageComponent;
   let fixture: ComponentFixture<MakeDetailPageComponent>;
-  let store: MockStore;
+  let loadMakeDetailSpy: jasmine.Spy;
+  let detailsSignal: ReturnType<typeof signal<Record<number, MakeDetail>>>;
+  let loadingSignal: ReturnType<typeof signal<boolean>>;
 
   beforeEach(async () => {
+    detailsSignal = signal<Record<number, MakeDetail>>({});
+    loadingSignal = signal<boolean>(false);
+    loadMakeDetailSpy = jasmine.createSpy('loadMakeDetail');
+
+    const mockStore = {
+      details: detailsSignal.asReadonly(),
+      loading: loadingSignal.asReadonly(),
+      loadMakeDetail: loadMakeDetailSpy,
+    };
+
     await TestBed.configureTestingModule({
       imports: [MakeDetailPageComponent],
       providers: [
         provideRouter([]),
         provideNoopAnimations(),
-        provideMockStore({ initialState }),
+        { provide: MakeDetailStore, useValue: mockStore },
       ],
     }).compileComponents();
-
-    store = TestBed.inject(MockStore);
-    store.overrideSelector(makeDetailFeature.selectEntities, {});
-    store.overrideSelector(makeDetailFeature.selectLoading, false);
 
     fixture = TestBed.createComponent(MakeDetailPageComponent);
     component = fixture.componentInstance;
@@ -36,24 +38,24 @@ describe('MakeDetailPageComponent', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => store.resetSelectors());
-
   it('creates successfully', () => {
     expect(component).toBeTruthy();
   });
 
-  it('dispatches loadMakeDetail with the provided makeId on init', () => {
-    const dispatchSpy = spyOn(store, 'dispatch');
-    fixture.componentRef.setInput('makeId', 7);
-    fixture.detectChanges();
-    expect(dispatchSpy).toHaveBeenCalledWith(makeDetailActions.loadMakeDetail({ makeId: 7 }));
+  it('calls loadMakeDetail with the provided makeId on init', () => {
+    expect(loadMakeDetailSpy).toHaveBeenCalledWith(42);
   });
 
-  it('shows detail data when the entity is available in the store', () => {
-    store.overrideSelector(makeDetailFeature.selectEntities, {
+  it('calls loadMakeDetail with the updated makeId when input changes', () => {
+    fixture.componentRef.setInput('makeId', 7);
+    fixture.detectChanges();
+    expect(loadMakeDetailSpy).toHaveBeenCalledWith(7);
+  });
+
+  it('shows detail data when entity is available', () => {
+    detailsSignal.set({
       42: { makeId: 42, types: [], models: [{ id: 1, name: 'Corolla', makeName: 'TOYOTA' }] },
     });
-    store.refreshState();
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('TOYOTA');
   });

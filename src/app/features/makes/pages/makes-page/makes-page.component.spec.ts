@@ -2,63 +2,66 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { provideMockStore, MockStore } from '@ngrx/store/testing';
+import { signal } from '@angular/core';
 import { MakesPageComponent } from './makes-page.component';
-import { makesActions } from '../../stores/makes-actions';
-import { makesFeature } from '../../stores/makes-features';
-import { adapter } from '../../stores/makes-features';
+import { MakesStore } from '../../stores/makes.store';
 import { MAKES_MOCK } from '@shared/consts/testing.constants';
-
-const initialState = {
-  makes: adapter.setAll(MAKES_MOCK, adapter.getInitialState({ filter: '', loading: false, loaded: true, error: null })),
-};
+import { Make } from '@domain/make.model';
 
 describe('MakesPageComponent', () => {
   let component: MakesPageComponent;
   let fixture: ComponentFixture<MakesPageComponent>;
-  let store: MockStore;
   let router: Router;
+  let loadMakesSpy: jasmine.Spy;
+  let setFilterSpy: jasmine.Spy;
+  let filteredMakesSignal: ReturnType<typeof signal<Make[]>>;
+  let loadingSignal: ReturnType<typeof signal<boolean>>;
+  let filterSignal: ReturnType<typeof signal<string>>;
 
   beforeEach(async () => {
+    filteredMakesSignal = signal<Make[]>(MAKES_MOCK);
+    loadingSignal = signal<boolean>(false);
+    filterSignal = signal<string>('');
+    loadMakesSpy = jasmine.createSpy('loadMakes');
+    setFilterSpy = jasmine.createSpy('setFilter');
+
+    const mockStore = {
+      filteredMakes: filteredMakesSignal.asReadonly(),
+      loading: loadingSignal.asReadonly(),
+      filter: filterSignal.asReadonly(),
+      loadMakes: loadMakesSpy,
+      setFilter: setFilterSpy,
+    };
+
     await TestBed.configureTestingModule({
       imports: [MakesPageComponent],
       providers: [
         provideRouter([]),
         provideNoopAnimations(),
-        provideMockStore({ initialState }),
+        { provide: MakesStore, useValue: mockStore },
       ],
     }).compileComponents();
 
-    store = TestBed.inject(MockStore);
     router = TestBed.inject(Router);
-    store.overrideSelector(makesFeature.selectFilteredMakes, MAKES_MOCK);
-    store.overrideSelector(makesFeature.selectLoading, false);
-    store.overrideSelector(makesFeature.selectFilter, '');
-
     fixture = TestBed.createComponent(MakesPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  afterEach(() => store.resetSelectors());
-
   it('creates successfully', () => {
     expect(component).toBeTruthy();
   });
 
-  it('dispatches loadMakes on init', () => {
-    const dispatchSpy = spyOn(store, 'dispatch');
-    component.ngOnInit();
-    expect(dispatchSpy).toHaveBeenCalledWith(makesActions.loadMakes());
+  it('calls loadMakes on init', () => {
+    expect(loadMakesSpy).toHaveBeenCalled();
   });
 
-  it('dispatches setFilter when onSearch is called', () => {
-    const dispatchSpy = spyOn(store, 'dispatch');
+  it('calls setFilter when onSearch is called', () => {
     component.onSearch('honda');
-    expect(dispatchSpy).toHaveBeenCalledWith(makesActions.setFilter({ searchTerm: 'honda' }));
+    expect(setFilterSpy).toHaveBeenCalledWith('honda');
   });
 
-  it('navigates to /makes/:id when onSelect is called', async () => {
+  it('navigates to /makes/:id when onSelect is called', () => {
     const navigateSpy = spyOn(router, 'navigate');
     component.onSelect(42);
     expect(navigateSpy).toHaveBeenCalledWith(['/makes', 42]);
