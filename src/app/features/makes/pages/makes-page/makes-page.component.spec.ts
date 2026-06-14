@@ -1,66 +1,83 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
-import { provideRouter } from '@angular/router';
+import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { Router, provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { provideMockStore, MockStore } from '@ngrx/store/testing';
+import { of, throwError } from 'rxjs';
 import { MakesPageComponent } from './makes-page.component';
-import { makesActions } from '../../stores/makes-actions';
-import { makesFeature } from '../../stores/makes-features';
-import { adapter } from '../../stores/makes-features';
+import { VpicApiService } from '@core/api/vpic-api.service';
+import { NotificationService } from '@shared/services/notification.service';
 import { MAKES_MOCK } from '@shared/consts/testing.constants';
-
-const initialState = {
-  makes: adapter.setAll(MAKES_MOCK, adapter.getInitialState({ filter: '', loading: false, loaded: true, error: null })),
-};
+import { Make } from '@domain/make.model';
 
 describe('MakesPageComponent', () => {
   let component: MakesPageComponent;
   let fixture: ComponentFixture<MakesPageComponent>;
-  let store: MockStore;
   let router: Router;
+  let apiSpy: jasmine.SpyObj<VpicApiService>;
+  let notificationSpy: jasmine.SpyObj<NotificationService>;
 
   beforeEach(async () => {
+    apiSpy = jasmine.createSpyObj('VpicApiService', ['getAllMakes']);
+    notificationSpy = jasmine.createSpyObj('NotificationService', ['error']);
+    apiSpy.getAllMakes.and.returnValue(of(MAKES_MOCK));
+
     await TestBed.configureTestingModule({
       imports: [MakesPageComponent],
       providers: [
         provideRouter([]),
         provideNoopAnimations(),
-        provideMockStore({ initialState }),
+        { provide: VpicApiService, useValue: apiSpy },
+        { provide: NotificationService, useValue: notificationSpy },
       ],
     }).compileComponents();
 
-    store = TestBed.inject(MockStore);
     router = TestBed.inject(Router);
-    store.overrideSelector(makesFeature.selectFilteredMakes, MAKES_MOCK);
-    store.overrideSelector(makesFeature.selectLoading, false);
-    store.overrideSelector(makesFeature.selectFilter, '');
-
-    fixture = TestBed.createComponent(MakesPageComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    // Fixture is NOT created here — each test (or nested beforeEach) creates it
+    // after the spy is in the desired state, because load() runs in the constructor.
   });
 
-  afterEach(() => store.resetSelectors());
+  function createComponent() {
+    fixture = TestBed.createComponent(MakesPageComponent);
+    component = fixture.componentInstance;
+  }
 
   it('creates successfully', () => {
+    createComponent();
+    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
-  it('dispatches loadMakes on init', () => {
-    const dispatchSpy = spyOn(store, 'dispatch');
-    component.ngOnInit();
-    expect(dispatchSpy).toHaveBeenCalledWith(makesActions.loadMakes());
+  it('fetches makes on init', () => {
+    createComponent();
+    fixture.detectChanges();
+    expect(apiSpy.getAllMakes).toHaveBeenCalled();
   });
 
-  it('dispatches setFilter when onSearch is called', () => {
-    const dispatchSpy = spyOn(store, 'dispatch');
-    component.onSearch('honda');
-    expect(dispatchSpy).toHaveBeenCalledWith(makesActions.setFilter({ searchTerm: 'honda' }));
-  });
-
-  it('navigates to /makes/:id when onSelect is called', async () => {
+  it('navigates to /makes/:id when onSelect is called', () => {
     const navigateSpy = spyOn(router, 'navigate');
+    createComponent();
+    fixture.detectChanges();
     component.onSelect(42);
     expect(navigateSpy).toHaveBeenCalledWith(['/makes', 42]);
+  });
+
+  it('filters makes when onSearch is called', () => {
+    createComponent();
+    fixture.detectChanges();
+    component.onSearch('honda');
+    const filtered = (component as unknown as { makes: () => Make[] }).makes();
+    expect(filtered).toEqual([{ id: 2, name: 'HONDA' }]);
+  });
+
+  describe('on API error', () => {
+    beforeEach(() => {
+      apiSpy.getAllMakes.and.returnValue(throwError(() => new Error('Network error')));
+      createComponent(); // Create AFTER setting the error spy
+    });
+
+    it('notifies on error', fakeAsync(() => {
+      fixture.detectChanges();
+      flushMicrotasks();
+      expect(notificationSpy.error).toHaveBeenCalledWith('Network error');
+    }));
   });
 });
