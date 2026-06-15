@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy, Component, computed, effect, inject, input, numberAttribute,
+  signal,
 } from '@angular/core';
 import { LoadingSpinnerComponent } from '@components/loading-spinner/loading-spinner.component';
 import { VehicleTypesListComponent } from '../../components/vehicle-type-list/vehicle-types-list.component';
@@ -10,6 +11,7 @@ import { makeDetailActions } from '../../stores/make-detail.actions';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@components/breadcrumb/breadcrumb.component';
 import { ROUTES } from '@shared/consts/routes.constants';
 import { MESSAGES } from '@shared/consts/i18n-messages';
+import { VehicleType } from '@domain/vehicle-type.model';
 
 @Component({
   selector: 'app-make-detail-page',
@@ -30,6 +32,23 @@ export class MakeDetailPageComponent {
   protected readonly detail = computed(() => this.entities()[this.makeId()]);
 
   protected readonly messages = MESSAGES.makeDetail;
+
+  protected readonly selectedType = signal<VehicleType | null>(null);
+
+  protected readonly displayedModels = computed(() => {
+    const type = this.selectedType();
+    const detail = this.detail();
+    if (!detail) return [];
+    if (!type) return detail.models;
+    return detail.modelsByType[type.name] ?? detail.models;
+  });
+
+  onSelectType(type: VehicleType | null): void {
+    this.selectedType.set(type);
+    if (type) {
+      this.store.dispatch(makeDetailActions.loadModelsByType({ makeId: this.makeId(), vehicleType: type.name }));
+    }
+  }
 
   protected readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
     { label: MESSAGES.makeDetail.breadcrumb, route: ROUTES.MAKES_PATH },

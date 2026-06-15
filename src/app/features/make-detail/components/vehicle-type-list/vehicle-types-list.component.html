@@ -1,6 +1,6 @@
   <mat-list>
     @for (type of types(); track type.id) {
-      <mat-list-item>{{ type.name }}</mat-list-item>
+      <mat-list-item [ngClass]="{ 'selected': type.id === selectType() }" class="typeItem" (click)="onSelectType(type.id)">{{ type.name }}</mat-list-item>
     } @empty {
       <p class="empty">{{ messages.emptyTypes }}</p>
     }

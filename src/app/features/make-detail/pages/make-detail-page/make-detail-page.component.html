@@ -5,10 +5,10 @@
   <app-breadcrumb [items]="breadcrumbs()" />
   <section class="block">
     <h2>{{ messages.vehicleTypesTitle }}</h2>
-    <app-vehicle-types-list [types]="d.types" />
+    <app-vehicle-types-list [types]="d.types" (selectTypeOutput)="onSelectType($event)" />
   </section>
   <section class="block block--models">
     <h2>{{ messages.modelsTitle }}</h2>
-    <app-models-list [models]="d.models" />
+    <app-models-list [models]="displayedModels()" />
   </section>
 }

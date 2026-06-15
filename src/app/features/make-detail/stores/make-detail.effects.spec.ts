@@ -79,7 +79,7 @@ describe('MakeDetailEffects', () => {
 
     it('does not emit when makeId is already cached', done => {
       store.overrideSelector(makeDetailFeature.selectEntities, {
-        42: { makeId: 42, types: [], models: [] },
+        42: { makeId: 42, types: [], models: [], modelsByType: {} },
       });
       store.refreshState();
 

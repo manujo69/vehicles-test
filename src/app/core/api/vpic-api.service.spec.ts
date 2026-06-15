@@ -70,6 +70,34 @@ describe('VpicApiService', () => {
     });
   });
 
+  describe('getModelsForMakeIdAndVehicleType', () => {
+    it('maps Model_ID, Model_Name and Make_Name to domain model', () => {
+      let result: VehicleModel[] = [];
+      service.getModelsForMakeIdAndVehicleType(1, 'Passenger Car').subscribe(m => (result = m));
+
+      const req = httpMock.expectOne(r => r.url.includes('GetModelsForMakeIdYear'));
+      req.flush({ Results: [{ Make_ID: 1, Make_Name: 'TOYOTA', Model_ID: 5, Model_Name: 'Corolla' }] });
+
+      expect(result).toEqual([{ id: 5, name: 'Corolla', makeName: 'TOYOTA' }]);
+    });
+
+    it('URL-encodes the vehicleType in the request URL', () => {
+      service.getModelsForMakeIdAndVehicleType(1, 'Passenger Car').subscribe();
+
+      const req = httpMock.expectOne(r => r.url.includes('GetModelsForMakeIdYear'));
+      expect(req.request.url).toContain('Passenger%20Car');
+      req.flush({ Results: [] });
+    });
+
+    it('builds URL with the correct makeId', () => {
+      service.getModelsForMakeIdAndVehicleType(77, 'Truck').subscribe();
+
+      const req = httpMock.expectOne(r => r.url.includes('GetModelsForMakeIdYear'));
+      expect(req.request.url).toContain('/makeId/77/');
+      req.flush({ Results: [] });
+    });
+  });
+
   describe('getModelsForMakeId', () => {
     it('maps Model_ID, Model_Name and Make_Name to domain model', () => {
       let result: VehicleModel[] = [];

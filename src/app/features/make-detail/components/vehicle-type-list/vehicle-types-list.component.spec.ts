@@ -37,4 +37,34 @@ describe('VehicleTypesListComponent', () => {
     expect(text).toContain('Passenger Car');
     expect(text).toContain('Truck');
   });
+
+  describe('onSelectType', () => {
+    it('selects a type and emits it via selectTypeOutput', () => {
+      const emitted: (VehicleType | null)[] = [];
+      component['selectTypeOutput'].subscribe((v: VehicleType | null) => emitted.push(v));
+
+      component.onSelectType(1);
+
+      expect(component.selectType()).toBe(1);
+      expect(emitted).toEqual([{ id: 1, name: 'Passenger Car' }]);
+    });
+
+    it('deselects the type and emits null when the same id is selected twice', () => {
+      const emitted: (VehicleType | null)[] = [];
+      component['selectTypeOutput'].subscribe((v: VehicleType | null) => emitted.push(v));
+
+      component.onSelectType(1);
+      component.onSelectType(1);
+
+      expect(component.selectType()).toBeNull();
+      expect(emitted).toEqual([{ id: 1, name: 'Passenger Car' }, null]);
+    });
+
+    it('switches selection from one type to another', () => {
+      component.onSelectType(1);
+      component.onSelectType(2);
+
+      expect(component.selectType()).toBe(2);
+    });
+  });
 });

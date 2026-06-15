@@ -30,7 +30,7 @@ describe('makeDetail reducer', () => {
 
     it('returns the same state reference when makeId is already in entities', () => {
       const withEntity = adapter.upsertOne(
-        { makeId: 1, types: [], models: [] },
+        { makeId: 1, types: [], models: [], modelsByType: {} },
         { ...initialState },
       );
       const state = reducer(withEntity, makeDetailActions.loadMakeDetail({ makeId: 1 }));
@@ -45,11 +45,11 @@ describe('makeDetail reducer', () => {
         makeDetailActions.loadMakeDetailSuccess({ makeId: 42, types, models }),
       );
       expect(state.loading).toBeFalse();
-      expect(state.entities[42]).toEqual({ makeId: 42, types, models });
+      expect(state.entities[42]).toEqual({ makeId: 42, types, models, modelsByType: {} });
     });
 
     it('does not reset other cached entities', () => {
-      const withExisting = adapter.upsertOne({ makeId: 1, types: [], models: [] }, initialState);
+      const withExisting = adapter.upsertOne({ makeId: 1, types: [], models: [], modelsByType: {} }, initialState);
       const state = reducer(
         withExisting,
         makeDetailActions.loadMakeDetailSuccess({ makeId: 2, types, models }),

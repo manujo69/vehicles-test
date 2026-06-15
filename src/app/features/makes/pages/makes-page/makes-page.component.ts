@@ -26,6 +26,7 @@ export class MakesPageComponent implements OnInit {
   protected readonly makesList = viewChild(MakesListComponent);
   protected readonly makes = this.store.selectSignal(makesFeature.selectFilteredMakes);
   protected readonly loading = this.store.selectSignal(makesFeature.selectLoading);
+
   protected readonly filter = this.store.selectSignal(makesFeature.selectFilter);
 
   ngOnInit(): void {

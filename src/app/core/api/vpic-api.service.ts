@@ -32,6 +32,12 @@ export class VpicApiService {
     );
   }
 
+  getModelsForMakeIdAndVehicleType(makeId: number, vehicleType: string): Observable<VehicleModel[]> {
+    return this.get<ModelDto>(`GetModelsForMakeIdYear/makeId/${makeId}/vehicleType/${encodeURIComponent(vehicleType)}`).pipe(
+      map(data => data.map(item => ({ id: item.Model_ID, name: item.Model_Name, makeName: item.Make_Name }))),
+    );
+  }
+
   private get<T>(path: string): Observable<T[]> {
     return this.http
       .get<VpicResponse<T>>(`${BASE_URL}/${path}`, { params: { format: 'json' } })

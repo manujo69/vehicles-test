@@ -8,6 +8,7 @@ export interface MakeDetail {
   makeId: number;
   types: VehicleType[];
   models: VehicleModel[];
+  modelsByType: Record<string, VehicleModel[]>;
 }
 
 export interface MakeDetailState extends EntityState<MakeDetail> {
@@ -35,7 +36,16 @@ export const makeDetailFeature = createFeature({
 
     // Make-detail loaded successfully
     on(makeDetailActions.loadMakeDetailSuccess, (state, { makeId, types, models }) =>
-      adapter.upsertOne({ makeId, types, models }, { ...state, loading: false })),
+      adapter.upsertOne({ makeId, types, models, modelsByType: {} }, { ...state, loading: false })),
+
+    on(makeDetailActions.loadModelsByTypeSuccess, (state, { makeId, vehicleType, models }) => {
+      const entity = state.entities[makeId];
+      if (!entity) return state;
+      return adapter.updateOne(
+        { id: makeId, changes: { modelsByType: { ...entity.modelsByType, [vehicleType]: models } } },
+        state,
+      );
+    }),
 
     // Loading make-detail failed!
     on(makeDetailActions.loadMakeDetailFailure, (state, { error }) =>

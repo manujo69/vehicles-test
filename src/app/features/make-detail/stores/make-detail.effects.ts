@@ -37,9 +37,26 @@ export class MakeDetailEffects {
     ),
   );
 
+  loadModelsByType$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(makeDetailActions.loadModelsByType),
+      concatLatestFrom(() => this.store.select(makeDetailFeature.selectEntities)),
+      filter(([{ makeId, vehicleType }, entities]) =>
+        !entities[makeId]?.modelsByType[vehicleType]),
+      switchMap(([{ makeId, vehicleType }]) =>
+        this.api.getModelsForMakeIdAndVehicleType(makeId, vehicleType).pipe(
+          map(models =>
+            makeDetailActions.loadModelsByTypeSuccess({ makeId, vehicleType, models })),
+          catchError(err =>
+            of(makeDetailActions.loadModelsByTypeFailure({ makeId, vehicleType, error: err.message }))),
+        ),
+      ),
+    ),
+  );
+
   notifyError$ = createEffect(
     () => this.actions$.pipe(
-      ofType(makeDetailActions.loadMakeDetailFailure),
+      ofType(makeDetailActions.loadMakeDetailFailure, makeDetailActions.loadModelsByTypeFailure),
       tap(({ error }) => this.notifications.error(error)),
     ),
     { dispatch: false },

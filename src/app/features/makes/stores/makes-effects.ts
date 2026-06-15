@@ -8,7 +8,6 @@ import { NotificationService } from '@shared/services/notification.service';
 import { makesFeature } from './makes-features';
 import { makesActions } from './makes-actions';
 
-
 @Injectable()
 export class MakesEffects {
   private readonly actions$ = inject(Actions);

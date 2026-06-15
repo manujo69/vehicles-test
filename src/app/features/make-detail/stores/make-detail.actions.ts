@@ -9,5 +9,11 @@ export const makeDetailActions = createActionGroup({
     'Load Make Detail Success':
       props<{ makeId: number; types: VehicleType[]; models: VehicleModel[] }>(),
     'Load Make Detail Failure': props<{ makeId: number; error: string }>(),
+
+    'Load Models By Type': props<{ makeId: number; vehicleType: string }>(),
+    'Load Models By Type Success':
+      props<{ makeId: number; vehicleType: string; models: VehicleModel[] }>(),
+    'Load Models By Type Failure':
+      props<{ makeId: number; vehicleType: string; error: string }>(),
   },
 });
