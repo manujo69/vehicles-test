@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { ReplaySubject, of } from 'rxjs';
@@ -31,6 +32,7 @@ describe('MakeDetailEffects', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        provideZonelessChangeDetection(),
         MakeDetailEffects,
         provideMockActions(() => actions$),
         provideMockStore(),

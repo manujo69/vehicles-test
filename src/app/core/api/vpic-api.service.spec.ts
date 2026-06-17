@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { VpicApiService } from './vpic-api.service';
@@ -14,7 +15,7 @@ describe('VpicApiService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting()],
     });
     service = TestBed.inject(VpicApiService);
     httpMock = TestBed.inject(HttpTestingController);

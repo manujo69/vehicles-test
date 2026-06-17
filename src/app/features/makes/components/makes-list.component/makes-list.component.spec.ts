@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { MakesListComponent } from './makes-list.component';
 import { Make } from '@domain/make.model';
 import { MAKES_MOCK } from '@shared/consts/testing.constants';
@@ -10,6 +11,7 @@ describe('MakesListComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [MakesListComponent],
+      providers: [provideZonelessChangeDetection()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MakesListComponent);

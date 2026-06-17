@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { Router } from '@angular/router';
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
@@ -23,6 +24,7 @@ describe('MakesPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MakesPageComponent],
       providers: [
+        provideZonelessChangeDetection(),
         provideRouter([]),
         provideNoopAnimations(),
         provideMockStore({ initialState }),

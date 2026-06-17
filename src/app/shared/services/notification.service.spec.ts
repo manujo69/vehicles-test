@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationService } from './notification.service';
 
@@ -9,7 +10,7 @@ describe('NotificationService', () => {
   beforeEach(() => {
     snackBarSpy = jasmine.createSpyObj<MatSnackBar>('MatSnackBar', ['open']);
     TestBed.configureTestingModule({
-      providers: [{ provide: MatSnackBar, useValue: snackBarSpy }],
+      providers: [provideZonelessChangeDetection(), { provide: MatSnackBar, useValue: snackBarSpy }],
     });
     service = TestBed.inject(NotificationService);
   });

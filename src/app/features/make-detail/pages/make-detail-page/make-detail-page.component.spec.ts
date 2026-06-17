@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideMockStore, MockStore } from '@ngrx/store/testing';
@@ -20,6 +21,7 @@ describe('MakeDetailPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MakeDetailPageComponent],
       providers: [
+        provideZonelessChangeDetection(),
         provideRouter([]),
         provideNoopAnimations(),
         provideMockStore({ initialState }),

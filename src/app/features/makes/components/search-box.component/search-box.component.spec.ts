@@ -1,6 +1,9 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { SearchBoxComponent } from './search-box.component';
+
+const wait = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 describe('SearchBoxComponent', () => {
   let component: SearchBoxComponent;
@@ -9,7 +12,7 @@ describe('SearchBoxComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [SearchBoxComponent],
-      providers: [provideNoopAnimations()],
+      providers: [provideZonelessChangeDetection(), provideNoopAnimations()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SearchBoxComponent);
@@ -28,54 +31,54 @@ describe('SearchBoxComponent', () => {
     expect(component['control'].value).toBe('toyota');
   });
 
-  it('emits search after debounce when control value changes', fakeAsync(() => {
+  it('emits search after debounce when control value changes', async () => {
     fixture.detectChanges();
     const emitted: string[] = [];
     component.searched.subscribe((term: string) => emitted.push(term));
 
     component['control'].setValue('honda');
-    tick(250);
+    await wait(300);
 
     expect(emitted).toEqual(['honda']);
-  }));
+  });
 
-  it('does not emit before debounce time elapses', fakeAsync(() => {
+  it('does not emit before debounce time elapses', async () => {
     fixture.detectChanges();
     const emitted: string[] = [];
     component.searched.subscribe((term: string) => emitted.push(term));
 
     component['control'].setValue('ho');
-    tick(100);
+    await wait(100);
 
     expect(emitted).toEqual([]);
-    tick(150);
-  }));
+    await wait(200); // let timer complete to avoid leaking into next test
+  });
 
-  it('emits only the last value within the debounce window', fakeAsync(() => {
+  it('emits only the last value within the debounce window', async () => {
     fixture.detectChanges();
     const emitted: string[] = [];
     component.searched.subscribe((term: string) => emitted.push(term));
 
     component['control'].setValue('h');
-    tick(100);
+    await wait(100);
     component['control'].setValue('ho');
-    tick(100);
+    await wait(100);
     component['control'].setValue('hon');
-    tick(250);
+    await wait(300);
 
     expect(emitted).toEqual(['hon']);
-  }));
+  });
 
-  it('does not emit the same value twice in a row (distinctUntilChanged)', fakeAsync(() => {
+  it('does not emit the same value twice in a row (distinctUntilChanged)', async () => {
     fixture.detectChanges();
     const emitted: string[] = [];
     component.searched.subscribe((term: string) => emitted.push(term));
 
     component['control'].setValue('toyota');
-    tick(250);
+    await wait(300);
     component['control'].setValue('toyota');
-    tick(250);
+    await wait(300);
 
     expect(emitted).toEqual(['toyota']);
-  }));
+  });
 });

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { ModelsListComponent } from './models-list.component';
 import { VehicleModel } from '@domain/vehicle-model.model';
 
@@ -14,6 +15,7 @@ describe('ModelsListComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ModelsListComponent],
+      providers: [provideZonelessChangeDetection()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ModelsListComponent);
