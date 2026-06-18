@@ -10,7 +10,9 @@
     "test": "ng test",
     "test:coverage": "ng test --code-coverage --watch=false --browsers ChromeHeadless",
     "lint": "ng lint",
-    "prepare": "husky"
+    "prepare": "husky",
+    "serve:dist": "serve dist/vehicles-test/browser -s -l 4200",
+    "preview": "npm run build && npm run serve:dist"
   },
   "prettier": {
     "printWidth": 100,
@@ -59,6 +61,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "prettier": "^3.8.4",
+    "serve": "^14.2.6",
     "typescript": "~5.9.2",
     "typescript-eslint": "8.46.4"
   },

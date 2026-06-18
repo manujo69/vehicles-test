@@ -27,14 +27,18 @@ export class MakeDetailPageComponent {
   protected readonly loading = this.store.selectSignal(makeDetailFeature.selectLoading);
 
   private readonly entities = this.store.selectSignal(makeDetailFeature.selectEntities);
-  protected readonly detail = computed(() => this.entities()[this.makeId()]);
+  protected readonly detail = computed(() =>
+    this.entities()[this.makeId()],
+    { debugName: 'makeDetail' }
+);
 
   protected readonly messages = MESSAGES.makeDetail;
 
   protected readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
     { label: MESSAGES.makeDetail.breadcrumb, route: ROUTES.MAKES_PATH },
     { label: this.detail()?.models[0]?.makeName ?? MESSAGES.makeDetail.breadcrumbFallback },
-  ]);
+  ],
+  { debugName: 'breadcrumbs' });
 
   constructor() {
     effect(() => {
