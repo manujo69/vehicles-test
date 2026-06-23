@@ -5,7 +5,7 @@ import { ReplaySubject, of } from 'rxjs';
 import { MakeDetailEffects } from './make-detail.effects';
 import { makeDetailActions } from './make-detail.actions';
 import { makeDetailFeature } from './make-detail.features';
-import { VpicApiService } from '@core/api/vpic-api.service';
+import { VpicApiPort } from '@core/api/vpic-api.port';
 import { NotificationService } from '@shared/services/notification.service';
 import { VehicleType } from '@domain/vehicle-type.model';
 import { VehicleModel } from '@domain/vehicle-model.model';
@@ -15,7 +15,7 @@ describe('MakeDetailEffects', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let actions$: ReplaySubject<any>;
   let store: MockStore;
-  let apiSpy: jasmine.SpyObj<VpicApiService>;
+  let apiSpy: jasmine.SpyObj<VpicApiPort>;
   let notificationSpy: jasmine.SpyObj<NotificationService>;
 
   const types: VehicleType[] = [{ id: 1, name: 'Passenger Car' }];
@@ -23,7 +23,7 @@ describe('MakeDetailEffects', () => {
 
   beforeEach(() => {
     actions$ = new ReplaySubject(1);
-    apiSpy = jasmine.createSpyObj<VpicApiService>('VpicApiService', [
+    apiSpy = jasmine.createSpyObj<VpicApiPort>('VpicApiPort', [
       'getVehicleTypesForMakeId',
       'getModelsForMakeId',
     ]);
@@ -34,7 +34,7 @@ describe('MakeDetailEffects', () => {
         MakeDetailEffects,
         provideMockActions(() => actions$),
         provideMockStore(),
-        { provide: VpicApiService, useValue: apiSpy },
+        { provide: VpicApiPort, useValue: apiSpy },
         { provide: NotificationService, useValue: notificationSpy },
       ],
     });

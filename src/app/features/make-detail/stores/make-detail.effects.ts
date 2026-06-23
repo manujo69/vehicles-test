@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { concatLatestFrom } from '@ngrx/operators';
 import { Store } from '@ngrx/store';
 import { catchError, filter, forkJoin, map, of, switchMap, tap } from 'rxjs';
-import { VpicApiService } from '@core/api/vpic-api.service';
+import { VpicApiPort } from '@core/api/vpic-api.port';
 import { NotificationService } from '@shared/services/notification.service';
 import { makeDetailActions } from './make-detail.actions';
 import { makeDetailFeature } from './make-detail.features';
@@ -11,7 +11,7 @@ import { makeDetailFeature } from './make-detail.features';
 @Injectable()
 export class MakeDetailEffects {
   private readonly actions$ = inject(Actions);
-  private readonly api = inject(VpicApiService);
+  private readonly api = inject(VpicApiPort);
   private readonly store = inject(Store);
   private readonly notifications = inject(NotificationService);
 

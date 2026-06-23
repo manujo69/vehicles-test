@@ -5,7 +5,7 @@ import { ReplaySubject, of } from 'rxjs';
 import { MakesEffects } from './makes-effects';
 import { makesActions } from './makes-actions';
 import { makesFeature } from './makes-features';
-import { VpicApiService } from '@core/api/vpic-api.service';
+import { VpicApiPort } from '@core/api/vpic-api.port';
 import { NotificationService } from '@shared/services/notification.service';
 import { MAKES_MOCK } from '@shared/consts/testing.constants';
 
@@ -14,13 +14,13 @@ describe('MakesEffects', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let actions$: ReplaySubject<any>;
   let store: MockStore;
-  let apiSpy: jasmine.SpyObj<VpicApiService>;
+  let apiSpy: jasmine.SpyObj<VpicApiPort>;
   let notificationSpy: jasmine.SpyObj<NotificationService>;
 
 
   beforeEach(() => {
     actions$ = new ReplaySubject(1);
-    apiSpy = jasmine.createSpyObj<VpicApiService>('VpicApiService', ['getAllMakes']);
+    apiSpy = jasmine.createSpyObj<VpicApiPort>('VpicApiPort', ['getAllMakes']);
     notificationSpy = jasmine.createSpyObj<NotificationService>('NotificationService', ['error']);
 
     TestBed.configureTestingModule({
@@ -28,7 +28,7 @@ describe('MakesEffects', () => {
         MakesEffects,
         provideMockActions(() => actions$),
         provideMockStore(),
-        { provide: VpicApiService, useValue: apiSpy },
+        { provide: VpicApiPort, useValue: apiSpy },
         { provide: NotificationService, useValue: notificationSpy },
       ],
     });

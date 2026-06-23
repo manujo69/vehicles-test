@@ -14,7 +14,7 @@ describe('VpicApiService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideHttpClient(), provideHttpClientTesting(), VpicApiService],
     });
     service = TestBed.inject(VpicApiService);
     httpMock = TestBed.inject(HttpTestingController);
