@@ -1,67 +1,93 @@
+/**
+ * Comportamiento del componente
+ *
+ * Qué prueba: lo que el usuario ve en el navegador — spinner de carga,
+ * listado de marcas, filtrado por búsqueda, navegación.
+ *
+ * Qué NO prueba: HTTP real, lógica del store, internals de NgRx.
+ * El puerto se sustituye por un fake con signals; la red nunca se toca aquí.
+ * Si cambias NgRx por TanStack o SignalStore, este fichero no debería modificarse.
+ */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { Router } from '@angular/router';
 import { signal } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { MakesPageComponent } from './makes-page.component';
-import { MakesStore } from '../../stores/makes.store';
-import { MAKES_MOCK } from '@shared/consts/testing.constants';
+import { MakesPort } from '../../data/makes.port';
+import { MakesListComponent } from '../../components/makes-list.component/makes-list.component';
 import { Make } from '@domain/make.model';
 
+function fakeMake(over: Partial<Make> = {}): Make {
+  return { id: 0, name: '', ...over };
+}
+
+function fakePort(over: { makes?: Make[]; loading?: boolean; filter?: string } = {}) {
+  return {
+    makes: signal(over.makes ?? []),
+    loading: signal(over.loading ?? false),
+    filter: signal(over.filter ?? ''),
+    loadMakes: jasmine.createSpy('loadMakes'),
+    setFilter: jasmine.createSpy('setFilter'),
+  };
+}
+
 describe('MakesPageComponent', () => {
-  let component: MakesPageComponent;
   let fixture: ComponentFixture<MakesPageComponent>;
-  let router: Router;
-  let loadMakesSpy: jasmine.Spy;
-  let setFilterSpy: jasmine.Spy;
-  let filteredMakesSignal: ReturnType<typeof signal<Make[]>>;
-  let loadingSignal: ReturnType<typeof signal<boolean>>;
-  let filterSignal: ReturnType<typeof signal<string>>;
+  let component: MakesPageComponent;
+  let port: ReturnType<typeof fakePort>;
 
   beforeEach(async () => {
-    filteredMakesSignal = signal<Make[]>(MAKES_MOCK);
-    loadingSignal = signal<boolean>(false);
-    filterSignal = signal<string>('');
-    loadMakesSpy = jasmine.createSpy('loadMakes');
-    setFilterSpy = jasmine.createSpy('setFilter');
-
-    const mockStore = {
-      filteredMakes: filteredMakesSignal.asReadonly(),
-      loading: loadingSignal.asReadonly(),
-      filter: filterSignal.asReadonly(),
-      loadMakes: loadMakesSpy,
-      setFilter: setFilterSpy,
-    };
+    port = fakePort({
+      makes: [
+        fakeMake({ id: 1, name: 'TOYOTA' }),
+        fakeMake({ id: 2, name: 'HONDA' }),
+      ],
+    });
 
     await TestBed.configureTestingModule({
       imports: [MakesPageComponent],
       providers: [
         provideRouter([]),
         provideNoopAnimations(),
-        { provide: MakesStore, useValue: mockStore },
+        { provide: MakesPort, useValue: port },
       ],
     }).compileComponents();
 
-    router = TestBed.inject(Router);
     fixture = TestBed.createComponent(MakesPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('creates successfully', () => {
-    expect(component).toBeTruthy();
+  it('shows the loading spinner while loading is true', () => {
+    port.loading.set(true);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('app-loading-spinner')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('app-makes-list')).toBeNull();
+  });
+
+  it('shows the makes list when loading is false', () => {
+    expect(fixture.nativeElement.querySelector('app-makes-list')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('app-loading-spinner')).toBeNull();
+  });
+
+  it('passes all makes to the list', () => {
+    const list = fixture.debugElement.query(By.directive(MakesListComponent));
+    expect(list.componentInstance.makes().length).toBe(2);
   });
 
   it('calls loadMakes on init', () => {
-    expect(loadMakesSpy).toHaveBeenCalled();
+    expect(port.loadMakes).toHaveBeenCalled();
   });
 
   it('calls setFilter when onSearch is called', () => {
     component.onSearch('honda');
-    expect(setFilterSpy).toHaveBeenCalledWith('honda');
+    expect(port.setFilter).toHaveBeenCalledWith('honda');
   });
 
   it('navigates to /makes/:id when onSelect is called', () => {
+    const router = TestBed.inject(Router);
     const navigateSpy = spyOn(router, 'navigate');
     component.onSelect(42);
     expect(navigateSpy).toHaveBeenCalledWith(['/makes', 42]);

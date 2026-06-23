@@ -1,7 +1,7 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { MakeDetailStore } from './make-detail.store';
-import { VpicApiService } from '@core/api/vpic-api.service';
+import { VpicApiPort } from '@core/api/vpic-api.port';
 import { NotificationService } from '@shared/services/notification.service';
 import { VehicleType } from '@domain/vehicle-type.model';
 import { VehicleModel } from '@domain/vehicle-model.model';
@@ -11,11 +11,11 @@ const models: VehicleModel[] = [{ id: 10, name: 'Corolla', makeName: 'TOYOTA' }]
 
 describe('MakeDetailStore', () => {
   let store: InstanceType<typeof MakeDetailStore>;
-  let apiSpy: jasmine.SpyObj<VpicApiService>;
+  let apiSpy: jasmine.SpyObj<VpicApiPort>;
   let notificationSpy: jasmine.SpyObj<NotificationService>;
 
   beforeEach(() => {
-    apiSpy = jasmine.createSpyObj<VpicApiService>('VpicApiService', [
+    apiSpy = jasmine.createSpyObj<VpicApiPort>('VpicApiPort', [
       'getVehicleTypesForMakeId',
       'getModelsForMakeId',
     ]);
@@ -24,7 +24,7 @@ describe('MakeDetailStore', () => {
     TestBed.configureTestingModule({
       providers: [
         MakeDetailStore,
-        { provide: VpicApiService, useValue: apiSpy },
+        { provide: VpicApiPort, useValue: apiSpy },
         { provide: NotificationService, useValue: notificationSpy },
       ],
     });

@@ -1,60 +1,73 @@
+/**
+ * Comportamiento del componente
+ *
+ * Qué prueba: lo que el usuario ve en el navegador — spinner de carga,
+ * datos del detalle y llamadas a loadMakeDetail cuando cambia el input.
+ *
+ * Qué NO prueba: HTTP real, lógica del store, internals de NgRx.
+ * El puerto se sustituye por un fake con signals; la red nunca se toca aquí.
+ * Si cambias NgRx por TanStack o SignalStore, este fichero no debería modificarse.
+ */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { signal } from '@angular/core';
 import { MakeDetailPageComponent } from './make-detail-page.component';
-import { MakeDetailStore, MakeDetail } from '../../stores/make-detail.store';
+import { MakeDetailPort } from '../../data/make-detail.port';
+import { MakeDetail } from '../../stores/make-detail.store';
+
+function fakeDetail(over: Partial<MakeDetail> = {}): MakeDetail {
+  return { makeId: 0, types: [], models: [], ...over };
+}
+
+function fakePort(over: { details?: Record<number, MakeDetail>; loading?: boolean } = {}) {
+  return {
+    loading: signal(over.loading ?? false),
+    details: signal(over.details ?? {}),
+    loadMakeDetail: jasmine.createSpy('loadMakeDetail'),
+  };
+}
 
 describe('MakeDetailPageComponent', () => {
-  let component: MakeDetailPageComponent;
   let fixture: ComponentFixture<MakeDetailPageComponent>;
-  let loadMakeDetailSpy: jasmine.Spy;
-  let detailsSignal: ReturnType<typeof signal<Record<number, MakeDetail>>>;
-  let loadingSignal: ReturnType<typeof signal<boolean>>;
+  let port: ReturnType<typeof fakePort>;
 
   beforeEach(async () => {
-    detailsSignal = signal<Record<number, MakeDetail>>({});
-    loadingSignal = signal<boolean>(false);
-    loadMakeDetailSpy = jasmine.createSpy('loadMakeDetail');
-
-    const mockStore = {
-      details: detailsSignal.asReadonly(),
-      loading: loadingSignal.asReadonly(),
-      loadMakeDetail: loadMakeDetailSpy,
-    };
+    port = fakePort();
 
     await TestBed.configureTestingModule({
       imports: [MakeDetailPageComponent],
       providers: [
         provideRouter([]),
         provideNoopAnimations(),
-        { provide: MakeDetailStore, useValue: mockStore },
+        { provide: MakeDetailPort, useValue: port },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MakeDetailPageComponent);
-    component = fixture.componentInstance;
     fixture.componentRef.setInput('makeId', 42);
     fixture.detectChanges();
   });
 
-  it('creates successfully', () => {
-    expect(component).toBeTruthy();
+  it('shows the loading spinner while loading is true', () => {
+    port.loading.set(true);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('app-loading-spinner')).toBeTruthy();
   });
 
   it('calls loadMakeDetail with the provided makeId on init', () => {
-    expect(loadMakeDetailSpy).toHaveBeenCalledWith(42);
+    expect(port.loadMakeDetail).toHaveBeenCalledWith(42);
   });
 
   it('calls loadMakeDetail with the updated makeId when input changes', () => {
     fixture.componentRef.setInput('makeId', 7);
     fixture.detectChanges();
-    expect(loadMakeDetailSpy).toHaveBeenCalledWith(7);
+    expect(port.loadMakeDetail).toHaveBeenCalledWith(7);
   });
 
-  it('shows detail data when entity is available', () => {
-    detailsSignal.set({
-      42: { makeId: 42, types: [], models: [{ id: 1, name: 'Corolla', makeName: 'TOYOTA' }] },
+  it('shows detail data when the entity is available', () => {
+    port.details.set({
+      42: fakeDetail({ makeId: 42, models: [{ id: 1, name: 'Corolla', makeName: 'TOYOTA' }] }),
     });
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('TOYOTA');

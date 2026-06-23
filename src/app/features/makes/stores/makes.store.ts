@@ -3,7 +3,7 @@ import { patchState, signalStore, withComputed, withMethods, withState } from '@
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { tapResponse } from '@ngrx/operators';
 import { filter, pipe, switchMap, tap } from 'rxjs';
-import { VpicApiService } from '@core/api/vpic-api.service';
+import { VpicApiPort } from '@core/api/vpic-api.port';
 import { NotificationService } from '@shared/services/notification.service';
 import { Make } from '@domain/make.model';
 
@@ -32,7 +32,7 @@ export const MakesStore = signalStore(
       return term ? makes().filter(m => m.name.toLowerCase().includes(term)) : makes();
     }),
   })),
-  withMethods((store, api = inject(VpicApiService), notifications = inject(NotificationService)) => ({
+  withMethods((store, api = inject(VpicApiPort), notifications = inject(NotificationService)) => ({
     setFilter(searchTerm: string): void {
       patchState(store, { filter: searchTerm });
     },

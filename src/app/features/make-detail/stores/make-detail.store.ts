@@ -3,7 +3,7 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { tapResponse } from '@ngrx/operators';
 import { filter, forkJoin, pipe, switchMap, tap } from 'rxjs';
-import { VpicApiService } from '@core/api/vpic-api.service';
+import { VpicApiPort } from '@core/api/vpic-api.port';
 import { NotificationService } from '@shared/services/notification.service';
 import { VehicleType } from '@domain/vehicle-type.model';
 import { VehicleModel } from '@domain/vehicle-model.model';
@@ -28,7 +28,7 @@ const initialState: MakeDetailState = {
 
 export const MakeDetailStore = signalStore(
   withState(initialState),
-  withMethods((store, api = inject(VpicApiService), notifications = inject(NotificationService)) => ({
+  withMethods((store, api = inject(VpicApiPort), notifications = inject(NotificationService)) => ({
     loadMakeDetail: rxMethod<number>(
       pipe(
         filter((makeId) => !store.details()[makeId]),

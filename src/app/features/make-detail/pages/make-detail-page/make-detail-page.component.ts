@@ -4,7 +4,7 @@ import {
 import { LoadingSpinnerComponent } from '@components/loading-spinner/loading-spinner.component';
 import { VehicleTypesListComponent } from '../../components/vehicle-type-list/vehicle-types-list.component';
 import { ModelsListComponent } from '../../components/models-list.component/models-list.component';
-import { MakeDetailStore } from '../../stores/make-detail.store';
+import { MakeDetailPort } from '../../data/make-detail.port';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@components/breadcrumb/breadcrumb.component';
 import { ROUTES } from '@shared/consts/routes.constants';
 import { MESSAGES } from '@shared/consts/i18n-messages';
@@ -17,12 +17,12 @@ import { MESSAGES } from '@shared/consts/i18n-messages';
   styleUrl: './make-detail-page.component.scss',
 })
 export class MakeDetailPageComponent {
-  private readonly store = inject(MakeDetailStore);
+  private readonly port = inject(MakeDetailPort);
 
   makeId = input.required({ transform: numberAttribute });
 
-  protected readonly loading = this.store.loading;
-  protected readonly detail = computed(() => this.store.details()[this.makeId()]);
+  protected readonly loading = this.port.loading;
+  protected readonly detail = computed(() => this.port.details()[this.makeId()]);
 
   protected readonly messages = MESSAGES.makeDetail;
 
@@ -33,7 +33,7 @@ export class MakeDetailPageComponent {
 
   constructor() {
     effect(() => {
-      this.store.loadMakeDetail(this.makeId());
+      this.port.loadMakeDetail(this.makeId());
     });
   }
 }

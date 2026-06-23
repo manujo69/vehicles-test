@@ -1,23 +1,23 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { MakesStore } from './makes.store';
-import { VpicApiService } from '@core/api/vpic-api.service';
+import { VpicApiPort } from '@core/api/vpic-api.port';
 import { NotificationService } from '@shared/services/notification.service';
 import { MAKES_MOCK } from '@shared/consts/testing.constants';
 
 describe('MakesStore', () => {
   let store: InstanceType<typeof MakesStore>;
-  let apiSpy: jasmine.SpyObj<VpicApiService>;
+  let apiSpy: jasmine.SpyObj<VpicApiPort>;
   let notificationSpy: jasmine.SpyObj<NotificationService>;
 
   beforeEach(() => {
-    apiSpy = jasmine.createSpyObj<VpicApiService>('VpicApiService', ['getAllMakes']);
+    apiSpy = jasmine.createSpyObj<VpicApiPort>('VpicApiPort', ['getAllMakes']);
     notificationSpy = jasmine.createSpyObj<NotificationService>('NotificationService', ['error']);
 
     TestBed.configureTestingModule({
       providers: [
         MakesStore,
-        { provide: VpicApiService, useValue: apiSpy },
+        { provide: VpicApiPort, useValue: apiSpy },
         { provide: NotificationService, useValue: notificationSpy },
       ],
     });

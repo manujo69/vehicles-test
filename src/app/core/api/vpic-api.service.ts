@@ -1,4 +1,3 @@
-// core/api/vpic-api.service.ts
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
@@ -6,29 +5,29 @@ import { Make } from '@domain/make.model';
 import { VehicleType } from '@domain/vehicle-type.model';
 import { VehicleModel } from '@domain/vehicle-model.model';
 import { MakeDto, ModelDto, VehicleTypeDto, VpicResponse } from './vpic.dto';
+import { toMake, toVehicleModel, toVehicleType } from './vpic-api.adapters';
+import { VpicApiPort } from './vpic-api.port';
 import { environment } from '../../../environments/environment';
 
 const BASE_URL = environment.apiUrl;
 
 @Injectable({ providedIn: 'root' })
-export class VpicApiService {
+export class VpicApiService extends VpicApiPort {
   private readonly http = inject(HttpClient);
 
   getAllMakes(): Observable<Make[]> {
-    return this.get<MakeDto>('GetAllMakes').pipe(
-      map(data => data.map(item => ({ id: item.Make_ID, name: item.Make_Name }))),
-    );
+    return this.get<MakeDto>('GetAllMakes').pipe(map(data => data.map(toMake)));
   }
 
   getVehicleTypesForMakeId(makeId: number): Observable<VehicleType[]> {
     return this.get<VehicleTypeDto>(`GetVehicleTypesForMakeId/${makeId}`).pipe(
-      map(data => data.map(item => ({ id: item.VehicleTypeId, name: item.VehicleTypeName }))),
+      map(data => data.map(toVehicleType)),
     );
   }
 
   getModelsForMakeId(makeId: number): Observable<VehicleModel[]> {
     return this.get<ModelDto>(`GetModelsForMakeId/${makeId}`).pipe(
-      map(data => data.map(item => ({ id: item.Model_ID, name: item.Model_Name, makeName: item.Make_Name }))),
+      map(data => data.map(toVehicleModel)),
     );
   }
 
