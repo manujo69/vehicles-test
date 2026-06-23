@@ -1,10 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
-import { injectQuery } from '@tanstack/angular-query-experimental';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { VpicApiService } from '@core/api/vpic-api.service';
+import { MakesPort } from '../../data/makes.port';
 import { NotificationService } from '@shared/services/notification.service';
 import { LoadingSpinnerComponent } from '@components/loading-spinner/loading-spinner.component';
 import { MakesListComponent } from '../../components/makes-list.component/makes-list.component';
@@ -20,7 +18,7 @@ import { MESSAGES } from '@shared/consts/i18n-messages';
   styleUrls: ['./makes-page.component.scss'],
 })
 export class MakesPageComponent {
-  private readonly api = inject(VpicApiService);
+  private readonly port = inject(MakesPort);
   private readonly router = inject(Router);
   private readonly notifications = inject(NotificationService);
 
@@ -28,23 +26,18 @@ export class MakesPageComponent {
   protected readonly makesList = viewChild(MakesListComponent);
   protected readonly filter = signal('');
 
-  protected readonly makesQuery = injectQuery(() => ({
-    queryKey: ['makes'],
-    queryFn: () => firstValueFrom(this.api.getAllMakes()),
-  }));
-
-  protected readonly loading = computed(() => this.makesQuery.isPending());
+  protected readonly loading = this.port.loading;
 
   protected readonly makes = computed(() => {
-    const data = this.makesQuery.data() ?? [];
+    const all = this.port.makes();
     const term = this.filter().trim().toLowerCase();
-    return term ? data.filter(m => m.name.toLowerCase().includes(term)) : data;
+    return term ? all.filter(m => m.name.toLowerCase().includes(term)) : all;
   });
 
   constructor() {
     effect(() => {
-      const error = this.makesQuery.error();
-      if (error) this.notifications.error((error as Error).message);
+      const error = this.port.error();
+      if (error) this.notifications.error(error);
     });
   }
 

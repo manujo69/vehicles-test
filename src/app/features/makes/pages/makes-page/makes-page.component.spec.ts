@@ -1,142 +1,112 @@
+/**
+ * Comportamiento del componente
+ *
+ * Qué prueba: lo que el usuario ve en el navegador — spinner de carga,
+ * listado de marcas, filtrado por búsqueda, navegación y notificación de errores.
+ *
+ * Qué NO prueba: HTTP real, lógica del adapter, internals de TanStack.
+ * El puerto se sustituye por un fake con signals; la red nunca se toca aquí.
+ * Si cambias TanStack por NgRx o SignalStore, este fichero no debería modificarse.
+ */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { provideAngularQuery, QueryClient } from '@tanstack/angular-query-experimental';
-import { Signal } from '@angular/core';
-import { NEVER, of, throwError } from 'rxjs';
+import { Router } from '@angular/router';
+import { signal } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { MakesPageComponent } from './makes-page.component';
+import { MakesPort } from '../../data/makes.port';
+import { MakesListComponent } from '../../components/makes-list.component/makes-list.component';
 import { NotificationService } from '@shared/services/notification.service';
-import { VpicApiService } from '@core/api/vpic-api.service';
-import { MAKES_MOCK } from '@shared/consts/testing.constants';
 import { Make } from '@domain/make.model';
 
-interface TestableMakesPage {
-  filter: Signal<string>;
-  makes: Signal<Make[]>;
+function fakeMake(over: Partial<Make> = {}): Make {
+  return { id: 0, name: '', ...over };
+}
+
+function fakePort(over: { makes?: Make[]; loading?: boolean; error?: string | null } = {}) {
+  return {
+    makes: signal(over.makes ?? []),
+    loading: signal(over.loading ?? false),
+    error: signal(over.error ?? null),
+  };
 }
 
 describe('MakesPageComponent', () => {
-  let component: MakesPageComponent;
   let fixture: ComponentFixture<MakesPageComponent>;
-  let router: Router;
-  let apiSpy: jasmine.SpyObj<VpicApiService>;
-  let queryClient: QueryClient;
-  let testable: TestableMakesPage;
+  let component: MakesPageComponent;
+  let port: ReturnType<typeof fakePort>;
 
   beforeEach(async () => {
-    apiSpy = jasmine.createSpyObj('VpicApiService', ['getAllMakes']);
-    apiSpy.getAllMakes.and.returnValue(of(MAKES_MOCK));
-
-    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    port = fakePort({
+      makes: [
+        fakeMake({ id: 1, name: 'TOYOTA' }),
+        fakeMake({ id: 2, name: 'HONDA' }),
+      ],
+    });
 
     await TestBed.configureTestingModule({
       imports: [MakesPageComponent],
       providers: [
         provideRouter([]),
         provideNoopAnimations(),
-        provideAngularQuery(client),
-        { provide: VpicApiService, useValue: apiSpy },
+        { provide: MakesPort, useValue: port },
+        { provide: NotificationService, useValue: jasmine.createSpyObj('NotificationService', ['error']) },
       ],
     }).compileComponents();
 
-    queryClient = TestBed.inject(QueryClient);
-    queryClient.setQueryData(['makes'], MAKES_MOCK);
-
-    router = TestBed.inject(Router);
     fixture = TestBed.createComponent(MakesPageComponent);
     component = fixture.componentInstance;
-    testable = component as unknown as TestableMakesPage;
     fixture.detectChanges();
   });
 
-  it('crea el componente correctamente', () => {
-    expect(component).toBeTruthy();
+  it('shows the loading spinner while loading is true', () => {
+    port.loading.set(true);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('app-loading-spinner')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('app-makes-list')).toBeNull();
   });
 
-  it('actualiza el filtro cuando se llama a onSearch', () => {
-    component.onSearch('honda');
-    expect(testable.filter()).toBe('honda');
+  it('shows the makes list when loading is false', () => {
+    expect(fixture.nativeElement.querySelector('app-makes-list')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('app-loading-spinner')).toBeNull();
   });
 
-  it('filtra las marcas por el término de búsqueda', () => {
+  it('passes all makes to the list when the filter is empty', () => {
+    const list = fixture.debugElement.query(By.directive(MakesListComponent));
+    expect(list.componentInstance.makes().length).toBe(2);
+  });
+
+  it('filters makes by the search term', () => {
     component.onSearch('toyota');
-    const filtered = testable.makes();
-    expect(filtered.every((m: Make) => m.name.toLowerCase().includes('toyota'))).toBeTrue();
+    fixture.detectChanges();
+    const list = fixture.debugElement.query(By.directive(MakesListComponent));
+    const filtered: Make[] = list.componentInstance.makes();
+    expect(filtered.length).toBe(1);
+    expect(filtered[0].name).toBe('TOYOTA');
   });
 
-  it('devuelve todas las marcas cuando el filtro está vacío', () => {
-    expect(testable.makes().length).toBe(MAKES_MOCK.length);
+  it('shows all makes again when the search term is cleared', () => {
+    component.onSearch('toyota');
+    fixture.detectChanges();
+    component.onSearch('');
+    fixture.detectChanges();
+    const list = fixture.debugElement.query(By.directive(MakesListComponent));
+    expect(list.componentInstance.makes().length).toBe(2);
   });
 
-  it('navega a /makes/:id cuando se llama a onSelect', () => {
+  it('navigates to /makes/:id when onSelect is called', () => {
+    const router = TestBed.inject(Router);
     const navigateSpy = spyOn(router, 'navigate');
     component.onSelect(42);
     expect(navigateSpy).toHaveBeenCalledWith(['/makes', 42]);
   });
 
-});
-
-describe('MakesPageComponent - sin datos precargados', () => {
-  let testable: TestableMakesPage;
-
-  beforeEach(async () => {
-    const pendingApiSpy = jasmine.createSpyObj<VpicApiService>('VpicApiService', ['getAllMakes']);
-    pendingApiSpy.getAllMakes.and.returnValue(NEVER);
-
-    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-
-    await TestBed.configureTestingModule({
-      imports: [MakesPageComponent],
-      providers: [
-        provideRouter([]),
-        provideNoopAnimations(),
-        provideAngularQuery(client),
-        { provide: VpicApiService, useValue: pendingApiSpy },
-      ],
-    }).compileComponents();
-
-    const fixture = TestBed.createComponent(MakesPageComponent);
-    const component = fixture.componentInstance;
-    testable = component as unknown as TestableMakesPage;
+  it('notifies the user when port.error() is set', async () => {
+    const notifications = TestBed.inject(NotificationService) as jasmine.SpyObj<NotificationService>;
+    port.error.set('Network failure');
     fixture.detectChanges();
-  });
-
-  it('devuelve array vacío cuando la query no tiene datos', () => {
-    expect(testable.makes()).toEqual([]);
-  });
-});
-
-describe('MakesPageComponent - manejo de errores', () => {
-  let notificationsService: NotificationService;
-  let errorFixture: ComponentFixture<MakesPageComponent>;
-
-  beforeEach(async () => {
-    const errorApiSpy = jasmine.createSpyObj<VpicApiService>('VpicApiService', ['getAllMakes']);
-    errorApiSpy.getAllMakes.and.returnValue(throwError(() => new Error('API error')));
-
-    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-
-    await TestBed.configureTestingModule({
-      imports: [MakesPageComponent],
-      providers: [
-        provideRouter([]),
-        provideNoopAnimations(),
-        provideAngularQuery(client),
-        { provide: VpicApiService, useValue: errorApiSpy },
-      ],
-    }).compileComponents();
-
-    notificationsService = TestBed.inject(NotificationService);
-    spyOn(notificationsService, 'error');
-    errorFixture = TestBed.createComponent(MakesPageComponent);
-    errorFixture.detectChanges();
-  });
-
-  it('notifica el error cuando la query de marcas falla', async () => {
     await new Promise(r => setTimeout(r, 0));
-    await new Promise(r => setTimeout(r, 0));
-    errorFixture.detectChanges();
-    expect(notificationsService.error).toHaveBeenCalledWith('API error');
+    expect(notifications.error).toHaveBeenCalledWith('Network failure');
   });
 });
