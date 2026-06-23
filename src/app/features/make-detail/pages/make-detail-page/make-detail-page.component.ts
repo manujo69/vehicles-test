@@ -4,9 +4,7 @@ import {
 import { LoadingSpinnerComponent } from '@components/loading-spinner/loading-spinner.component';
 import { VehicleTypesListComponent } from '../../components/vehicle-type-list/vehicle-types-list.component';
 import { ModelsListComponent } from '../../components/models-list.component/models-list.component';
-import { makeDetailFeature } from '../../stores/make-detail.features';
-import { Store } from '@ngrx/store';
-import { makeDetailActions } from '../../stores/make-detail.actions';
+import { MakeDetailPort } from '../../data/make-detail.port';
 import { BreadcrumbComponent, type BreadcrumbItem } from '@components/breadcrumb/breadcrumb.component';
 import { ROUTES } from '@shared/consts/routes.constants';
 import { MESSAGES } from '@shared/consts/i18n-messages';
@@ -19,16 +17,12 @@ import { MESSAGES } from '@shared/consts/i18n-messages';
   styleUrl: './make-detail-page.component.scss',
 })
 export class MakeDetailPageComponent {
-  private readonly store = inject(Store);
+  private readonly port = inject(MakeDetailPort);
 
-  // Input Signal for makeId
   makeId = input.required({ transform: numberAttribute });
 
-  protected readonly loading = this.store.selectSignal(makeDetailFeature.selectLoading);
-
-  private readonly entities = this.store.selectSignal(makeDetailFeature.selectEntities);
-  protected readonly detail = computed(() => this.entities()[this.makeId()]);
-
+  protected readonly loading = this.port.loading;
+  protected readonly detail = this.port.detail;
   protected readonly messages = MESSAGES.makeDetail;
 
   protected readonly breadcrumbs = computed<BreadcrumbItem[]>(() => [
@@ -38,7 +32,7 @@ export class MakeDetailPageComponent {
 
   constructor() {
     effect(() => {
-      this.store.dispatch(makeDetailActions.loadMakeDetail({ makeId: this.makeId() }));
+      this.port.loadMakeDetail(this.makeId());
     });
   }
 }

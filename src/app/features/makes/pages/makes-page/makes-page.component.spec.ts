@@ -1,64 +1,93 @@
+/**
+ * Comportamiento del componente
+ *
+ * Qué prueba: lo que el usuario ve en el navegador — spinner de carga,
+ * listado de marcas y respuesta a interacciones.
+ *
+ * Qué NO prueba: HTTP real, lógica del adapter, internals del store.
+ * El puerto se sustituye por un fake con signals; la red nunca se toca aquí.
+ * Si cambias la tecnología de estado, este fichero no debería modificarse.
+ */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { provideMockStore, MockStore } from '@ngrx/store/testing';
+import { Router } from '@angular/router';
+import { signal } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { MakesPageComponent } from './makes-page.component';
-import { makesActions } from '../../stores/makes-actions';
-import { makesFeature } from '../../stores/makes-features';
-import { adapter } from '../../stores/makes-features';
-import { MAKES_MOCK } from '@shared/consts/testing.constants';
+import { MakesPort } from '../../data/makes.port';
+import { MakesListComponent } from '../../components/makes-list.component/makes-list.component';
+import { Make } from '@domain/make.model';
 
-const initialState = {
-  makes: adapter.setAll(MAKES_MOCK, adapter.getInitialState({ filter: '', loading: false, loaded: true, error: null })),
-};
+function fakeMake(over: Partial<Make> = {}): Make {
+  return { id: 0, name: '', ...over };
+}
+
+function fakePort(over: { makes?: Make[]; loading?: boolean; filter?: string } = {}) {
+  return {
+    makes: signal(over.makes ?? []),
+    loading: signal(over.loading ?? false),
+    filter: signal(over.filter ?? ''),
+    loadMakes: jasmine.createSpy('loadMakes'),
+    setFilter: jasmine.createSpy('setFilter'),
+  };
+}
 
 describe('MakesPageComponent', () => {
-  let component: MakesPageComponent;
   let fixture: ComponentFixture<MakesPageComponent>;
-  let store: MockStore;
-  let router: Router;
+  let component: MakesPageComponent;
+  let port: ReturnType<typeof fakePort>;
 
   beforeEach(async () => {
+    port = fakePort({
+      makes: [
+        fakeMake({ id: 1, name: 'TOYOTA' }),
+        fakeMake({ id: 2, name: 'HONDA' }),
+      ],
+    });
+
     await TestBed.configureTestingModule({
       imports: [MakesPageComponent],
       providers: [
         provideRouter([]),
         provideNoopAnimations(),
-        provideMockStore({ initialState }),
+        { provide: MakesPort, useValue: port },
       ],
     }).compileComponents();
-
-    store = TestBed.inject(MockStore);
-    router = TestBed.inject(Router);
-    store.overrideSelector(makesFeature.selectFilteredMakes, MAKES_MOCK);
-    store.overrideSelector(makesFeature.selectLoading, false);
-    store.overrideSelector(makesFeature.selectFilter, '');
 
     fixture = TestBed.createComponent(MakesPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  afterEach(() => store.resetSelectors());
-
-  it('creates successfully', () => {
-    expect(component).toBeTruthy();
+  it('triggers loadMakes on init', () => {
+    expect(port.loadMakes).toHaveBeenCalled();
   });
 
-  it('dispatches loadMakes on init', () => {
-    const dispatchSpy = spyOn(store, 'dispatch');
-    component.ngOnInit();
-    expect(dispatchSpy).toHaveBeenCalledWith(makesActions.loadMakes());
+  it('shows the loading spinner while loading is true', () => {
+    port.loading.set(true);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('app-loading-spinner')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('app-makes-list')).toBeNull();
   });
 
-  it('dispatches setFilter when onSearch is called', () => {
-    const dispatchSpy = spyOn(store, 'dispatch');
+  it('shows the makes list when loading is false', () => {
+    expect(fixture.nativeElement.querySelector('app-makes-list')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('app-loading-spinner')).toBeNull();
+  });
+
+  it('passes all makes to the list', () => {
+    const list = fixture.debugElement.query(By.directive(MakesListComponent));
+    expect(list.componentInstance.makes().length).toBe(2);
+  });
+
+  it('calls setFilter when onSearch is called', () => {
     component.onSearch('honda');
-    expect(dispatchSpy).toHaveBeenCalledWith(makesActions.setFilter({ searchTerm: 'honda' }));
+    expect(port.setFilter).toHaveBeenCalledWith('honda');
   });
 
-  it('navigates to /makes/:id when onSelect is called', async () => {
+  it('navigates to /makes/:id when onSelect is called', () => {
+    const router = TestBed.inject(Router);
     const navigateSpy = spyOn(router, 'navigate');
     component.onSelect(42);
     expect(navigateSpy).toHaveBeenCalledWith(['/makes', 42]);
