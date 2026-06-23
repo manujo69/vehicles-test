@@ -1,0 +1,1 @@
+import{d as t,h as r}from"./chunk-E4NM5QPC.js";import"./chunk-CHSDADTL.js";import{b as e}from"./chunk-YXL7QO37.js";import{Rc as o}from"./chunk-BFQNGWD2.js";import"./chunk-2NFLSA4Y.js";var s=[{path:"",loadComponent:()=>import("./chunk-6PAXK7SK.js").then(m=>m.MakeDetailPageComponent),providers:[o(e),t(r)]}];export{s as routes};
